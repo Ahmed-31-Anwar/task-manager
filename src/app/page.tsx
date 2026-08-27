@@ -1,7 +1,7 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
+import SignInButton from "@/components/SignInButton";
 
 type Task = {
   id: number;
@@ -59,14 +59,8 @@ export default function Home() {
 
   async function deleteTask(id: number) {
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch(`/api/tasks?id=${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id,
-        }),
       });
 
       if (!response.ok) {
@@ -83,23 +77,28 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Task Manager</h1>
+      <header>
+        <h1>Task Manager</h1>
+        <p>Add and manage your tasks.</p>
 
-      <p>Add and manage your tasks.</p>
+        <SignInButton />
+      </header>
 
-      <input
-        type="text"
-        placeholder="Enter a task"
-        value={newTask}
-        onChange={(event) => setNewTask(event.target.value)}
-      />
+      <section>
+        <input
+          type="text"
+          placeholder="Enter a task"
+          value={newTask}
+          onChange={(event) => setNewTask(event.target.value)}
+        />
 
-      <button onClick={addTask}>Add Task</button>
+        <button onClick={addTask}>Add Task</button>
+      </section>
 
       <ul>
         {tasks.map((task) => (
           <li key={task.id}>
-            {task.title}
+            <span>{task.title}</span>
 
             <button onClick={() => deleteTask(task.id)}>
               Delete
@@ -110,4 +109,3 @@ export default function Home() {
     </main>
   );
 }
-
