@@ -112,22 +112,29 @@ export default function Home() {
   const userName = session?.user?.name?.split(" ")[0] || "there";
 
   return (
-    <main className="min-h-screen bg-[#0b0d12] text-slate-100">
+    <main className="min-h-screen overflow-hidden bg-[#08090d] text-slate-100">
+      {/* Background glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-40 -top-40 h-96 w-96 rounded-full bg-indigo-600/10 blur-3xl" />
+        <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-violet-600/10 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-blue-600/5 blur-3xl" />
+      </div>
+
       {/* Navigation */}
-      <nav className="border-b border-white/[0.06] bg-[#0b0d12]/95 backdrop-blur">
+      <nav className="relative border-b border-white/[0.06] bg-[#08090d]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500 text-lg font-bold text-white shadow-lg shadow-indigo-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-400/20 bg-indigo-500/10 text-lg font-bold text-indigo-400 shadow-lg shadow-indigo-500/5">
               ✓
             </div>
 
             <div>
-              <h1 className="text-lg font-bold tracking-tight text-white">
+              <h1 className="text-base font-bold tracking-tight text-white">
                 Task Manager
               </h1>
 
               <p className="text-xs text-slate-500">
-                Stay organized. Get things done.
+                Stay focused. Get things done.
               </p>
             </div>
           </div>
@@ -136,60 +143,78 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Main content */}
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        {/* Welcome */}
-        <section className="mb-10">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
-            Your workspace
-          </p>
+      {/* Main */}
+      <div className="relative mx-auto max-w-5xl px-6 py-12 sm:py-16">
 
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Good to see you, {userName}.
+        {/* Hero */}
+        <section className="mb-10">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-400/10 bg-indigo-500/[0.07] px-3 py-1.5 text-xs font-medium text-indigo-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400" />
+            Your personal workspace
+          </div>
+
+          <h2 className="max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Good to see you,{" "}
+            <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent">
+              {userName}.
+            </span>
           </h2>
 
-          <p className="mt-3 text-slate-400">
-            Keep track of what needs to get done today.
+          <p className="mt-4 max-w-xl text-base leading-7 text-slate-400">
+            Keep your day organized, stay focused, and turn your plans into
+            progress.
           </p>
         </section>
 
         {/* Stats */}
         <section className="mb-8 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/[0.07] bg-[#12151c] p-5 shadow-xl shadow-black/10">
-            <p className="text-sm font-medium text-slate-500">
-              Total tasks
-            </p>
+          <div className="group rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-indigo-400/20 hover:bg-white/[0.04]">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500">Total tasks</p>
 
-            <p className="mt-2 text-3xl font-bold text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-sm text-indigo-400">
+                ≡
+              </div>
+            </div>
+
+            <p className="mt-4 text-3xl font-bold text-white">
               {tasks.length}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/[0.07] bg-[#12151c] p-5 shadow-xl shadow-black/10">
-            <p className="text-sm font-medium text-slate-500">
-              Tasks added
-            </p>
+          <div className="group rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-violet-400/20 hover:bg-white/[0.04]">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500">Current focus</p>
 
-            <p className="mt-2 text-3xl font-bold text-indigo-400">
-              {tasks.length}
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-sm text-violet-400">
+                ✦
+              </div>
+            </div>
+
+            <p className="mt-4 text-lg font-bold text-violet-300">
+              {tasks.length === 0 ? "Nothing yet" : "Making progress"}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/[0.07] bg-[#12151c] p-5 shadow-xl shadow-black/10">
-            <p className="text-sm font-medium text-slate-500">
-              Status
-            </p>
+          <div className="group rounded-2xl border border-white/[0.07] bg-white/[0.025] p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-400/20 hover:bg-white/[0.04]">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500">Status</p>
 
-            <p className="mt-2 text-lg font-bold text-emerald-400">
-              {tasks.length === 0 ? "Ready to start" : "Making progress"}
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-sm text-emerald-400">
+                ✓
+              </div>
+            </div>
+
+            <p className="mt-4 text-lg font-bold text-emerald-300">
+              {tasks.length === 0 ? "Ready to start" : "On track"}
             </p>
           </div>
         </section>
 
         {/* Add task */}
-        <section className="mb-10 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#12151c] shadow-xl shadow-black/10">
+        <section className="mb-10 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] shadow-2xl shadow-black/20 backdrop-blur-sm">
           <div className="border-b border-white/[0.06] px-6 py-5">
-            <h3 className="font-bold text-white">
+            <h3 className="font-semibold text-white">
               Add a new task
             </h3>
 
@@ -209,20 +234,20 @@ export default function Home() {
                   addTask();
                 }
               }}
-              className="flex-1 rounded-xl border border-white/[0.08] bg-[#0b0d12] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-indigo-500/60 focus:ring-4 focus:ring-indigo-500/10"
+              className="flex-1 rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-indigo-400/40 focus:bg-black/30 focus:ring-4 focus:ring-indigo-500/10"
             />
 
             <button
               onClick={addTask}
               disabled={isAdding || !newTask.trim()}
-              className="rounded-xl bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/10 transition hover:bg-indigo-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+              className="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/10 transition hover:bg-indigo-500 hover:shadow-indigo-500/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-600"
             >
               {isAdding ? "Adding..." : "Add Task"}
             </button>
           </div>
 
           {error && (
-            <div className="mx-6 mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-400">
+            <div className="mx-6 mb-6 rounded-xl border border-red-400/10 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
               {error}
             </div>
           )}
@@ -230,7 +255,7 @@ export default function Home() {
 
         {/* Tasks */}
         <section>
-          <div className="mb-5 flex items-center justify-between">
+          <div className="mb-5 flex items-end justify-between">
             <div>
               <h3 className="text-xl font-bold text-white">
                 Your tasks
@@ -242,19 +267,19 @@ export default function Home() {
             </div>
 
             {tasks.length > 0 && (
-              <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400">
+              <span className="rounded-full border border-indigo-400/10 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-300">
                 {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
               </span>
             )}
           </div>
 
           {tasks.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/[0.1] bg-[#12151c] px-6 py-16 text-center shadow-xl shadow-black/10">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 text-2xl text-indigo-400">
+            <div className="rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-16 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-indigo-400/10 bg-indigo-500/10 text-2xl text-indigo-400 shadow-lg shadow-indigo-500/5">
                 ✓
               </div>
 
-              <h3 className="mt-5 font-semibold text-white">
+              <h3 className="mt-6 font-semibold text-white">
                 You&apos;re all caught up
               </h3>
 
@@ -268,9 +293,9 @@ export default function Home() {
               {tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="group flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-[#12151c] p-4 shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:border-indigo-500/20 hover:bg-[#151923] hover:shadow-xl"
+                  className="group flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 shadow-lg shadow-black/10 backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-indigo-400/20 hover:bg-white/[0.04] hover:shadow-indigo-500/5"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 font-bold text-indigo-400">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-indigo-400/10 bg-indigo-500/10 text-indigo-400 transition group-hover:bg-indigo-500/15">
                     ✓
                   </div>
 
@@ -278,11 +303,15 @@ export default function Home() {
                     <p className="break-words font-medium text-slate-200">
                       {task.title}
                     </p>
+
+                    <p className="mt-1 text-xs text-slate-600">
+                      Added to your workspace
+                    </p>
                   </div>
 
                   <button
                     onClick={() => deleteTask(task.id)}
-                    className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 opacity-100 transition hover:bg-red-500/10 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100"
+                    className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 opacity-100 transition hover:bg-red-500/10 hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100"
                   >
                     Delete
                   </button>
@@ -294,8 +323,8 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-16 border-t border-white/[0.06] bg-[#0b0d12]">
-        <div className="mx-auto max-w-6xl px-6 py-7 text-center text-xs text-slate-600">
+      <footer className="relative mt-16 border-t border-white/[0.06]">
+        <div className="mx-auto max-w-5xl px-6 py-7 text-center text-xs text-slate-600">
           Built with Next.js, Prisma, PostgreSQL & Google Authentication
         </div>
       </footer>
