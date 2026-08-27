@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .idea/
+
+# AI / development tool files
+.agents/
+.claude/
+.cursor/
+.devin/
