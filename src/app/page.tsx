@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,10 +15,14 @@ export default function Home() {
 
   useEffect(() => {
     async function loadTasks() {
-      const response = await fetch("/api/tasks");
-      const data = await response.json();
+      try {
+        const response = await fetch("/api/tasks");
+        const data = await response.json();
 
-      setTasks(data);
+        setTasks(data);
+      } catch (error) {
+        console.error("Failed to load tasks:", error);
+      }
     }
 
     loadTasks();
@@ -28,24 +33,52 @@ export default function Home() {
       return;
     }
 
-    const response = await fetch("/api/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: newTask,
-      }),
-    });
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: newTask,
+        }),
+      });
 
-    const task = await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to create task");
+      }
 
-    setTasks([...tasks, task]);
-    setNewTask("");
+      const task = await response.json();
+
+      setTasks((currentTasks) => [...currentTasks, task]);
+      setNewTask("");
+    } catch (error) {
+      console.error("Failed to add task:", error);
+    }
   }
 
-  function deleteTask(indexToDelete: number) {
-    setTasks(tasks.filter((_, index) => index !== indexToDelete));
+  async function deleteTask(id: number) {
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete task");
+      }
+
+      setTasks((currentTasks) =>
+        currentTasks.filter((task) => task.id !== id)
+      );
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
   }
 
   return (
@@ -64,11 +97,11 @@ export default function Home() {
       <button onClick={addTask}>Add Task</button>
 
       <ul>
-        {tasks.map((task, index) => (
+        {tasks.map((task) => (
           <li key={task.id}>
             {task.title}
 
-            <button onClick={() => deleteTask(index)}>
+            <button onClick={() => deleteTask(task.id)}>
               Delete
             </button>
           </li>
@@ -77,3 +110,4 @@ export default function Home() {
     </main>
   );
 }
+

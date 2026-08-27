@@ -1,3 +1,4 @@
+
 import { db } from "@/lib/prisma";
 
 export async function GET() {
@@ -45,6 +46,40 @@ export async function POST(request: Request) {
 
     return Response.json(
       { error: "Failed to create task" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+    const id = Number(body.id);
+
+    if (!Number.isInteger(id)) {
+      return Response.json(
+        { error: "Valid task ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const deletedTask = await db.orm.public.Task
+      .where({ id })
+      .delete();
+
+    if (!deletedTask) {
+      return Response.json(
+        { error: "Task not found" },
+        { status: 404 }
+      );
+    }
+
+    return Response.json(deletedTask);
+  } catch (error) {
+    console.error("Failed to delete task:", error);
+
+    return Response.json(
+      { error: "Failed to delete task" },
       { status: 500 }
     );
   }
