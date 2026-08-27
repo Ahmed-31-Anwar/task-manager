@@ -278,9 +278,7 @@ export default function Home() {
                       {task.title}
                     </p>
 
-                    <p className="mt-1 text-xs text-slate-400">
-                      Task #{task.id}
-                    </p>
+
                   </div>
 
                   <button
