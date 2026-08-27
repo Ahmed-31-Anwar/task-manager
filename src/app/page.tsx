@@ -12,6 +12,7 @@ type Task = {
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadTasks() {
@@ -19,9 +20,22 @@ export default function Home() {
         const response = await fetch("/api/tasks");
         const data = await response.json();
 
-        setTasks(data);
+        if (!response.ok) {
+          setError(data.error || "Please sign in to view your tasks.");
+          setTasks([]);
+          return;
+        }
+
+        if (Array.isArray(data)) {
+          setTasks(data);
+          setError("");
+        } else {
+          setTasks([]);
+        }
       } catch (error) {
         console.error("Failed to load tasks:", error);
+        setError("Something went wrong while loading your tasks.");
+        setTasks([]);
       }
     }
 
@@ -44,27 +58,39 @@ export default function Home() {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to create task");
+        setError(data.error || "Failed to create task.");
+        return;
       }
 
-      const task = await response.json();
-
-      setTasks((currentTasks) => [...currentTasks, task]);
+      setTasks((currentTasks) => [...currentTasks, data]);
       setNewTask("");
+      setError("");
     } catch (error) {
       console.error("Failed to add task:", error);
+      setError("Something went wrong while adding the task.");
     }
   }
 
   async function deleteTask(id: number) {
     try {
-      const response = await fetch(`/api/tasks?id=${id}`, {
+      const response = await fetch("/api/tasks", {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to delete task");
+        setError(data.error || "Failed to delete task.");
+        return;
       }
 
       setTasks((currentTasks) =>
@@ -72,6 +98,7 @@ export default function Home() {
       );
     } catch (error) {
       console.error("Failed to delete task:", error);
+      setError("Something went wrong while deleting the task.");
     }
   }
 
@@ -83,6 +110,8 @@ export default function Home() {
 
         <SignInButton />
       </header>
+
+      {error && <p>{error}</p>}
 
       <section>
         <input
