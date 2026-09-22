@@ -1,228 +1,795 @@
 # Task Manager
 
-A simple, full-stack task management application built to make keeping track of everyday tasks straightforward.
+A full-stack task management application built with Next.js, TypeScript, PostgreSQL, Prisma, NextAuth.js, Google OAuth, GitHub Actions, and Vercel.
 
-The project started as a way to learn and bring together different parts of modern web development — from building the interface and working with APIs to authentication, database management, GitHub, CI/CD, and deployment.
+The project provides authenticated users with a simple dashboard where they can sign in with Google, create tasks, delete tasks, and view their own task list.
 
-Users can sign in with Google, create their own tasks, delete them when they're finished, and come back later to find their tasks still saved to their account.
+The project is designed with a complete development and deployment workflow.
 
----
+The workflow includes:
 
-## Overview
-
-Task Manager is built with **Next.js and TypeScript**, with **PostgreSQL** used for persistent data storage and **Prisma** handling the database layer.
-
-Authentication is handled through **Google OAuth**, allowing each signed-in user to have their own separate task list.
-
-The application is deployed through **Vercel** and uses a hosted PostgreSQL database through **Neon**.
-
-The project also uses **GitHub Actions** to automate the build, testing, and release process.
-
----
-
-## Features
-
-* **Google Sign-In** — Sign in using an existing Google account.
-* **Personal task lists** — Each user sees only the tasks belonging to their account.
-* **Create tasks** — Add new tasks directly from the dashboard.
-* **Delete tasks** — Remove tasks that are no longer needed.
-* **Persistent storage** — Tasks remain saved when you sign out and return later.
-* **Task counter** — See how many tasks are currently in your list.
-* **Dark dashboard** — A simple dark interface designed to keep the application easy on the eyes.
-* **Cloud database** — PostgreSQL stores user and task data.
-* **CI/CD pipeline** — GitHub Actions is used to build, test, and release the application.
-* **Pull request checks** — Changes can be checked automatically before being merged into the main branch.
-* **Production deployment** — The application is configured to run on Vercel.
+- Local development
+- PostgreSQL persistence
+- Google authentication
+- API routes
+- Automated testing
+- ESLint checks
+- TypeScript checks
+- Production builds
+- GitHub Actions CI
+- Vercel production deployment
+- Environment variable management
 
 ---
 
-## Tech Stack
+## Table of Contents
 
-**Frontend**
-
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-
-**Backend**
-
-* Next.js API Routes
-* NextAuth.js
-
-**Database**
-
-* PostgreSQL
-* Prisma
-* Neon
-
-**Authentication**
-
-* Google OAuth
-* NextAuth.js
-
-**Deployment & Development**
-
-* Vercel
-* Git
-* GitHub
-* GitHub Actions
+- [Project Overview](#project-overview)
+- [Project Goals](#project-goals)
+- [Features](#features)
+- [User Flow](#user-flow)
+- [Architecture](#architecture)
+- [Technology Stack](#technology-stack)
+- [Version Information](#version-information)
+- [Frontend](#frontend)
+- [Backend](#backend)
+- [Authentication](#authentication)
+- [Google OAuth](#google-oauth)
+- [Sessions](#sessions)
+- [Database](#database)
+- [Neon PostgreSQL](#neon-postgresql)
+- [Prisma](#prisma)
+- [Prisma 8](#prisma-8)
+- [API](#api)
+- [API Routes](#api-routes)
+- [GET Tasks](#get-tasks)
+- [POST Tasks](#post-tasks)
+- [DELETE Tasks](#delete-tasks)
+- [Security](#security)
+- [User Data Isolation](#user-data-isolation)
+- [Project Structure](#project-structure)
+- [Important Files](#important-files)
+- [Environment Variables](#environment-variables)
+- [Local Development](#local-development)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Available Commands](#available-commands)
+- [Linting](#linting)
+- [TypeScript](#typescript)
+- [Testing](#testing)
+- [Vitest](#vitest)
+- [Production Build](#production-build)
+- [GitHub](#github)
+- [Git Workflow](#git-workflow)
+- [Pull Requests](#pull-requests)
+- [CI/CD](#ci-cd)
+- [Continuous Integration](#continuous-integration)
+- [Continuous Delivery](#continuous-delivery)
+- [Continuous Deployment](#continuous-deployment)
+- [Continuous Development](#continuous-development)
+- [CI/CD Pipeline](#ci-cd-pipeline)
+- [GitHub Actions](#github-actions)
+- [Build Workflow](#build-workflow)
+- [Test Workflow](#test-workflow)
+- [Release Workflow](#release-workflow)
+- [Workflow Dependencies](#workflow-dependencies)
+- [GitHub Secrets](#github-secrets)
+- [Vercel](#vercel)
+- [Vercel Deploy Hook](#vercel-deploy-hook)
+- [Production Deployment](#production-deployment)
+- [Google OAuth Production Configuration](#google-oauth-production-configuration)
+- [Local Development Flow](#local-development-flow)
+- [Pull Request Flow](#pull-request-flow)
+- [Main Branch Flow](#main-branch-flow)
+- [Troubleshooting](#troubleshooting)
+- [Prisma Troubleshooting](#prisma-troubleshooting)
+- [Database Troubleshooting](#database-troubleshooting)
+- [Authentication Troubleshooting](#authentication-troubleshooting)
+- [GitHub Actions Troubleshooting](#github-actions-troubleshooting)
+- [Vercel Troubleshooting](#vercel-troubleshooting)
+- [Release Troubleshooting](#release-troubleshooting)
+- [Security Practices](#security-practices)
+- [Dependency Management](#dependency-management)
+- [Git Command Reference](#git-command-reference)
+- [npm Command Reference](#npm-command-reference)
+- [GitHub Actions Reference](#github-actions-reference)
+- [Development Checklist](#development-checklist)
+- [Testing Checklist](#testing-checklist)
+- [Deployment Checklist](#deployment-checklist)
+- [Lessons Learned](#lessons-learned)
+- [Future Improvements](#future-improvements)
+- [Current Status](#current-status)
+- [Repository](#repository)
+- [Production](#production)
+- [Author](#author)
 
 ---
 
-## How It Works
+# Project Overview
 
-The application follows a straightforward flow:
+Task Manager is a web application for managing personal tasks.
 
-```text
-Google Account
-      ↓
-Google Authentication
-      ↓
-User Session
-      ↓
-Task Manager
-      ↓
-Create / View / Delete Tasks
-      ↓
-PostgreSQL Database
-```
+The application uses Google authentication.
 
-When a user creates a task, the task is associated with their user ID.
+Each authenticated user receives their own task list.
 
-When the task list is requested, the API uses the current session to identify the user and returns only that user's tasks.
+Tasks are stored in PostgreSQL.
 
-This keeps different accounts' task lists separate.
+The backend communicates with the database through Prisma.
 
-The project also has a CI/CD flow that handles the application checks and production release:
+The application is built with Next.js.
 
-```text
-Pull Request
-      ↓
-Build Workflow
-      ↓
-Test Workflow
-      ↓
-Merge to Main
-      ↓
-Release Workflow
-      ↓
-Vercel Production
-```
+The application is deployed using Vercel.
+
+GitHub Actions provides automated validation.
+
+The CI/CD system checks the application before production deployment.
 
 ---
+
+# Project Goals
+
+The main goals of the project are:
+
+- Build a functional task management application.
+- Use modern web technologies.
+- Use PostgreSQL for persistent storage.
+- Implement authentication.
+- Protect user-specific data.
+- Provide a simple interface.
+- Create API routes for task operations.
+- Add automated tests.
+- Add linting.
+- Add TypeScript validation.
+- Add automated production builds.
+- Create a GitHub Actions pipeline.
+- Connect the application to Vercel.
+- Automate production releases.
+- Keep the project maintainable.
+- Keep the project suitable for future development.
+
+---
+
+# Features
 
 ## Authentication
 
-Google authentication is implemented using **NextAuth.js**.
+The application supports:
 
-After signing in, the application receives the user's session and uses it to determine which account is currently active.
+- Google sign-in.
+- Google sign-out.
+- Authenticated sessions.
+- Protected task operations.
+- User-specific task data.
 
-The authenticated user's ID is then used when working with tasks, so tasks created by one account aren't shown to another account.
+## Task Management
 
-Google OAuth credentials and other sensitive configuration values are stored using environment variables rather than being committed to the repository.
+Users can:
 
-For the deployed application, Google OAuth also needs the correct callback URL configured.
-
-The callback URL follows this format:
-
-```text
-https://your-domain.com/api/auth/callback/google
-```
-
-The actual deployed Vercel domain needs to be added to the Google OAuth configuration.
-
----
+- Add tasks.
+- View tasks.
+- Delete tasks.
+- See their task count.
+- Manage their own task list.
 
 ## Database
 
-The application uses PostgreSQL with Prisma.
+The application uses:
 
-There are two main models:
+- PostgreSQL.
+- Neon PostgreSQL hosting.
+- Prisma ORM.
+- Persistent task storage.
 
-### User
+## User Isolation
 
-Stores the account information provided through authentication.
+Tasks are associated with authenticated users.
 
-```text
-User
-├── id
-├── name
-├── email
-├── image
-└── tasks
-```
+A user should only access their own tasks.
 
-### Task
+The API uses the authenticated session when determining the current user.
 
-Stores the tasks created by users.
+## UI
 
-```text
-Task
-├── id
-├── title
-├── createdAt
-└── userId
-```
+The application includes:
 
-The relationship between `User` and `Task` allows each task to belong to a specific account.
-
-This makes it possible for users to have their own separate task lists.
+- Dashboard-style interface.
+- Dark aesthetic.
+- Task counter.
+- Task list.
+- Task creation.
+- Task deletion.
+- Authentication controls.
 
 ---
 
-## Prisma
+# User Flow
 
-Prisma is used as the database layer between the application and PostgreSQL.
+The normal user flow is:
 
-The project uses a newer Prisma setup with the database configuration defined through `prisma.config.ts` and the Prisma contract stored inside the `prisma` directory.
+1. Open the application.
+2. View the authentication interface.
+3. Sign in with Google.
+4. Return to the application.
+5. Receive an authenticated session.
+6. View the task dashboard.
+7. Add a task.
+8. The task is stored in PostgreSQL.
+9. The task appears in the task list.
+10. Delete a task when it is no longer needed.
+11. Sign out when finished.
 
-The database connection is provided through the `DATABASE_URL` environment variable.
+---
 
-The Prisma contract is prepared using:
+# Architecture
+
+The application can be viewed as several connected layers.
+
+```text
+User
+  |
+  v
+Next.js Frontend
+  |
+  v
+Authentication
+  |
+  v
+Next.js API Routes
+  |
+  v
+Prisma
+  |
+  v
+Neon PostgreSQL
+```
+
+The deployment pipeline is separate from the runtime architecture.
+
+```text
+Developer
+    |
+    v
+Git
+    |
+    v
+GitHub
+    |
+    v
+GitHub Actions
+    |
+    +----> Build
+    |
+    +----> Test
+    |
+    +----> Release
+              |
+              v
+          Vercel
+              |
+              v
+        Production App
+```
+
+---
+
+# Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Next.js | Full-stack web framework |
+| React | User interface |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling |
+| NextAuth.js | Authentication |
+| Google OAuth | User authentication |
+| Prisma | Database access |
+| PostgreSQL | Relational database |
+| Neon | PostgreSQL hosting |
+| Vitest | Automated testing |
+| ESLint | Code quality |
+| GitHub | Source control |
+| GitHub Actions | CI/CD |
+| Vercel | Deployment |
+
+---
+
+# Version Information
+
+The project currently uses:
+
+| Package | Version |
+|---|---|
+| Next.js | 16.3.3 |
+| React | 19.2.8 |
+| Node.js | 24.20.0 |
+| npm | 11.19.0 |
+| TypeScript | 5.x |
+| Prisma | 8.0.0-rc.12 |
+| Prisma ORM PostgreSQL | 8.0.0-rc.8 |
+| NextAuth.js | 5.0.0-beta.32 |
+| Vitest | 5.0.1 |
+| ESLint | 9.x |
+| Tailwind CSS | 4.x |
+
+---
+
+# Frontend
+
+The frontend is built with Next.js and React.
+
+The application uses the Next.js App Router.
+
+The primary page is located at:
+
+```text
+src/app/page.tsx
+```
+
+The frontend is responsible for:
+
+- Rendering the dashboard.
+- Displaying authentication controls.
+- Displaying tasks.
+- Creating tasks through the API.
+- Deleting tasks through the API.
+- Displaying the task count.
+- Handling user interactions.
+
+---
+
+# Backend
+
+The backend functionality is provided through Next.js API routes.
+
+The task API is located under:
+
+```text
+src/app/api/tasks/
+```
+
+Authentication is handled under:
+
+```text
+src/app/api/auth/
+```
+
+The application does not require a separate Express server.
+
+Next.js handles both frontend and backend functionality.
+
+---
+
+# Authentication
+
+Authentication is handled with NextAuth.js.
+
+The application uses Google OAuth as the authentication provider.
+
+Authentication provides the application with an authenticated user session.
+
+The session is used when accessing protected task functionality.
+
+The authentication configuration is located at:
+
+```text
+src/auth.ts
+```
+
+---
+
+# Google OAuth
+
+Google OAuth allows users to authenticate without creating a separate password for the application.
+
+The basic flow is:
+
+```text
+User
+  |
+  v
+Sign in with Google
+  |
+  v
+Google OAuth
+  |
+  v
+Authentication callback
+  |
+  v
+NextAuth.js
+  |
+  v
+Authenticated session
+  |
+  v
+Task Manager
+```
+
+The Google OAuth application requires:
+
+- Google Client ID.
+- Google Client Secret.
+- Correct redirect URI.
+- Correct production callback URL.
+- Correct environment variables.
+
+---
+
+# OAuth Environment Variables
+
+The application uses environment variables for authentication.
+
+```text
+AUTH_SECRET
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+```
+
+These values must not be committed to Git.
+
+They should be stored securely.
+
+---
+
+# Sessions
+
+The authenticated session identifies the current user.
+
+Task API operations use the authenticated session.
+
+This allows the backend to determine which user's tasks should be returned or modified.
+
+A task request without a valid authenticated session should not be treated as a normal authenticated task request.
+
+---
+
+# Database
+
+The application uses PostgreSQL.
+
+The PostgreSQL database is hosted using Neon.
+
+The database provides persistent storage.
+
+Without a persistent database, tasks would not reliably survive application restarts or deployments.
+
+---
+
+# Neon PostgreSQL
+
+Neon provides the PostgreSQL database used by the application.
+
+The project uses a `DATABASE_URL`.
+
+The connection string is stored as an environment variable.
+
+The application does not place the database connection string directly inside source code.
+
+The database is used by Prisma.
+
+---
+
+# DATABASE_URL
+
+The primary database environment variable is:
+
+```text
+DATABASE_URL
+```
+
+The value should contain the PostgreSQL connection string supplied by Neon.
+
+Example format:
+
+```text
+postgresql://username:password@host/database
+```
+
+The actual database credentials should never be placed in this README.
+
+The actual connection string should never be committed to Git.
+
+---
+
+# Prisma
+
+Prisma is used to communicate with PostgreSQL.
+
+Prisma provides:
+
+- Database configuration.
+- Database access.
+- Database typing.
+- Database contracts.
+- Database tooling.
+
+The Prisma configuration is located at:
+
+```text
+prisma.config.ts
+```
+
+The application also contains:
+
+```text
+prisma/
+```
+
+and:
+
+```text
+migrations/
+```
+
+---
+
+# Prisma Configuration
+
+The current configuration loads `.env.local`.
+
+```ts
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env.local" });
+import { definePrismaConfig } from "prisma/config";
+import { defineConfig as ormConfig } from "@prisma/orm-postgres/config";
+
+export default definePrismaConfig({
+  orm: ormConfig({
+    contract: "./prisma/contract.prisma",
+    db: {
+      connection: process.env["DATABASE_URL"]!,
+    },
+  }),
+
+  skills: {
+    agents: ["claude", "cursor", "agents", "devin"],
+  },
+});
+```
+
+---
+
+# Prisma 8
+
+This project uses a Prisma 8 release candidate.
+
+Because of the Prisma version being used, some older Prisma commands do not apply to this project.
+
+The project uses:
 
 ```bash
 npx prisma contract emit
 ```
 
-This command is also used inside the GitHub Actions workflows before the application is built.
+for emitting the Prisma contract.
 
-The database connection string is kept outside the source code and is provided through environment variables.
+The old command:
+
+```bash
+npx prisma generate
+```
+
+should not be assumed to be the correct command for this project.
 
 ---
 
-## Project Structure
+# Prisma Contract
+
+The project uses:
+
+```text
+prisma/contract.prisma
+```
+
+The contract is referenced by the Prisma configuration.
+
+The build workflow emits the contract before building the Next.js application.
+
+The test workflow also emits the contract before running validation.
+
+---
+
+# Prisma Skills
+
+The project includes Prisma skill synchronization.
+
+The `package.json` contains:
+
+```json
+"postinstall": "prisma skills sync || exit 0"
+```
+
+The command allows the installation process to synchronize Prisma skill files.
+
+The command is allowed to exit successfully even if skill synchronization encounters an issue.
+
+---
+
+# API
+
+The application exposes API functionality through Next.js route handlers.
+
+The task API supports:
+
+- GET
+- POST
+- DELETE
+
+The API is responsible for communicating between the frontend and the database.
+
+---
+
+# API Routes
+
+The main task endpoint is:
+
+```text
+/api/tasks
+```
+
+The authentication endpoint is:
+
+```text
+/api/auth/[...nextauth]
+```
+
+---
+
+# GET Tasks
+
+The GET endpoint retrieves the authenticated user's tasks.
+
+The general flow is:
+
+```text
+GET /api/tasks
+        |
+        v
+Check session
+        |
+        v
+Identify user
+        |
+        v
+Query database
+        |
+        v
+Return user's tasks
+```
+
+The endpoint should not return another user's task data.
+
+---
+
+# POST Tasks
+
+The POST endpoint creates a task.
+
+The general flow is:
+
+```text
+POST /api/tasks
+        |
+        v
+Check session
+        |
+        v
+Validate request
+        |
+        v
+Identify user
+        |
+        v
+Create task
+        |
+        v
+Save to PostgreSQL
+        |
+        v
+Return response
+```
+
+---
+
+# DELETE Tasks
+
+The DELETE endpoint removes a task.
+
+The general flow is:
+
+```text
+DELETE /api/tasks
+        |
+        v
+Check session
+        |
+        v
+Identify task
+        |
+        v
+Verify user ownership
+        |
+        v
+Delete task
+        |
+        v
+Return response
+```
+
+---
+
+# Security
+
+Security considerations include:
+
+- OAuth credentials are stored as secrets.
+- Database credentials are stored as environment variables.
+- User-specific task queries use authentication context.
+- Sensitive values are not committed to Git.
+- GitHub Actions receives secrets through GitHub Secrets.
+- Vercel receives production environment variables through its environment configuration.
+
+---
+
+# User Data Isolation
+
+User data isolation is an important part of the application.
+
+The application should associate tasks with authenticated users.
+
+When a user requests tasks, the backend should use the authenticated user's identity.
+
+This prevents the application from treating the task list as one global shared list.
+
+The intended relationship is:
+
+```text
+User A
+  |
+  +---- Task A1
+  |
+  +---- Task A2
+
+User B
+  |
+  +---- Task B1
+  |
+  +---- Task B2
+```
+
+User A should not receive User B's tasks.
+
+User B should not receive User A's tasks.
+
+---
+
+# Project Structure
 
 ```text
 task-manager/
-│
 ├── .github/
 │   └── workflows/
 │       ├── build.yml
 │       ├── test.yml
 │       └── release.yml
-│
-├── migrations/          # Database migration history
-│
-├── prisma/              # Prisma schema and generated contract files
-│
-├── public/              # Public application assets
-│
+├── migrations/
+├── prisma/
+├── public/
 ├── src/
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── auth/
 │   │   │   └── tasks/
 │   │   └── page.tsx
-│   │
 │   ├── components/
 │   │   └── SignInButton.tsx
-│   │
 │   ├── lib/
 │   │   └── prisma.ts
-│   │
 │   └── auth.ts
-│
+├── tests/
+│   └── tasks.test.ts
 ├── .gitignore
 ├── README.md
 ├── next.config.ts
@@ -230,205 +797,838 @@ task-manager/
 ├── prisma.config.ts
 ├── postcss.config.mjs
 ├── tsconfig.json
-└── eslint.config.mjs
+├── eslint.config.mjs
+└── vitest.config.mts
 ```
-
-The `.github/workflows` directory contains the GitHub Actions workflows used for the CI/CD pipeline.
 
 ---
 
-## Running Locally
+# Important Files
 
-### Requirements
+## `src/app/page.tsx`
 
-You'll need:
+The main application page.
 
-* Node.js
-* npm
-* Git
-* A PostgreSQL database
-* Google OAuth credentials
+It contains the primary dashboard interface.
 
-### 1. Clone the repository
+---
+
+## `src/auth.ts`
+
+Contains authentication configuration.
+
+Google authentication is configured through NextAuth.js.
+
+---
+
+## `src/lib/prisma.ts`
+
+Contains the application's Prisma database access.
+
+---
+
+## `src/app/api/tasks/`
+
+Contains the task API route.
+
+The route handles task-related operations.
+
+---
+
+## `src/app/api/auth/`
+
+Contains the NextAuth API route.
+
+---
+
+## `src/components/SignInButton.tsx`
+
+Contains the sign-in interface component.
+
+---
+
+## `tests/tasks.test.ts`
+
+Contains automated functional tests for the task API.
+
+---
+
+## `prisma.config.ts`
+
+Contains Prisma configuration.
+
+---
+
+## `eslint.config.mjs`
+
+Contains ESLint configuration.
+
+---
+
+## `vitest.config.mts`
+
+Contains Vitest configuration.
+
+---
+
+## `.github/workflows/build.yml`
+
+Defines the automated build workflow.
+
+---
+
+## `.github/workflows/test.yml`
+
+Defines the automated testing workflow.
+
+---
+
+## `.github/workflows/release.yml`
+
+Defines the automated release workflow.
+
+---
+
+# Environment Variables
+
+The project uses environment variables for sensitive configuration.
+
+The main variables are:
+
+```text
+DATABASE_URL
+AUTH_SECRET
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+```
+
+GitHub Actions also uses:
+
+```text
+VERCEL_DEPLOY_HOOK
+```
+
+---
+
+# Local Environment File
+
+Local development values can be placed in:
+
+```text
+.env.local
+```
+
+Example:
+
+```env
+DATABASE_URL="your-neon-database-url"
+AUTH_SECRET="your-auth-secret"
+AUTH_GOOGLE_ID="your-google-client-id"
+AUTH_GOOGLE_SECRET="your-google-client-secret"
+```
+
+The actual values should never be committed.
+
+---
+
+# Environment Variable Responsibilities
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection |
+| `AUTH_SECRET` | Authentication secret |
+| `AUTH_GOOGLE_ID` | Google OAuth client ID |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret |
+| `VERCEL_DEPLOY_HOOK` | Triggers Vercel deployment |
+
+---
+
+# Local Development
+
+The local project path is:
+
+```text
+C:\Users\F-05\Desktop\Projects\task-manager
+```
+
+Open the project in the development environment.
+
+Install dependencies.
+
+Configure environment variables.
+
+Run the development server.
+
+---
+
+# Clone Repository
+
+The repository can be cloned using:
 
 ```bash
 git clone https://github.com/Ahmed-31-Anwar/task-manager.git
+```
+
+Move into the project directory:
+
+```bash
 cd task-manager
 ```
 
-### 2. Install dependencies
+---
+
+# Install Dependencies
+
+Install dependencies using:
 
 ```bash
 npm install
 ```
 
-### 3. Set up environment variables
+For CI environments, the project uses:
 
-Create a `.env.local` file in the root of the project.
-
-Add the required configuration:
-
-```env
-DATABASE_URL="your-postgresql-connection-string"
-
-AUTH_SECRET="your-auth-secret"
-
-AUTH_GOOGLE_ID="your-google-client-id"
-
-AUTH_GOOGLE_SECRET="your-google-client-secret"
+```bash
+npm ci
 ```
 
-Replace the placeholder values with your own credentials.
+---
 
-**Never commit `.env.local` or expose your authentication/database credentials.**
+# Configure Environment Variables
 
-### 4. Start the development server
+Create:
+
+```text
+.env.local
+```
+
+Add the required environment variables.
+
+Do not commit `.env.local`.
+
+---
+
+# Start Development Server
+
+Run:
 
 ```bash
 npm run dev
 ```
 
-Then open:
+Next.js will start the development server.
+
+The local application can normally be accessed through the local development URL shown by Next.js.
+
+---
+
+# Development Cycle
+
+A typical development cycle is:
 
 ```text
-http://localhost:3000
+Edit
+  |
+  v
+Run locally
+  |
+  v
+Test functionality
+  |
+  v
+Run lint
+  |
+  v
+Run TypeScript check
+  |
+  v
+Run tests
+  |
+  v
+Build
+  |
+  v
+Commit
+  |
+  v
+Push
 ```
 
 ---
 
-## Building for Production
+# Available Commands
 
-The production build can be tested locally with:
+## Development
+
+```bash
+npm run dev
+```
+
+Starts the development server.
+
+---
+
+## Production Build
 
 ```bash
 npm run build
 ```
 
-A successful build confirms that the Next.js application compiles and the application's routes can be generated correctly.
-
-The build process is also used in the GitHub Actions CI/CD workflow.
+Creates a production build.
 
 ---
 
-## Deployment
+## Production Server
 
-The application is deployed using **Vercel**.
-
-The production environment requires the same core environment variables used during local development, configured through Vercel's project settings.
-
-Google OAuth also needs to be configured with the production callback URL:
-
-```text
-https://your-domain.com/api/auth/callback/google
+```bash
+npm run start
 ```
 
-The PostgreSQL database is hosted through **Neon**, allowing the deployed application to persist task data.
-
-The project also uses GitHub Actions for the production release process.
+Starts the production server after a successful build.
 
 ---
 
-## CI/CD
+## Lint
 
-The project uses **GitHub Actions** to automate the process of checking and releasing changes.
+```bash
+npm run lint
+```
 
-The CI/CD setup is split into three separate workflows:
+Runs ESLint.
+
+---
+
+## Tests
+
+```bash
+npm test
+```
+
+Runs the Vitest test suite.
+
+---
+
+## TypeScript
+
+```bash
+npx tsc --noEmit
+```
+
+Checks TypeScript without generating output.
+
+---
+
+## Prisma Contract
+
+```bash
+npx prisma contract emit
+```
+
+Emits the Prisma contract used by the project.
+
+---
+
+# Linting
+
+ESLint is used to identify code quality problems.
+
+The configuration is stored in:
+
+```text
+eslint.config.mjs
+```
+
+The project uses:
+
+- Next.js Core Web Vitals rules.
+- Next.js TypeScript rules.
+- Custom generated-file ignores.
+
+---
+
+# ESLint Configuration
+
+The project ignores generated Prisma files.
+
+It also ignores Prisma-related skill directories.
+
+The relevant ignored paths include:
+
+```text
+prisma/contract.d.ts
+migrations/**
+.agents/**
+.claude/**
+.cursor/**
+.devin/**
+```
+
+This prevents generated or tool-managed files from causing unnecessary lint failures.
+
+---
+
+# TypeScript
+
+TypeScript provides static type checking.
+
+The CI workflow runs:
+
+```bash
+npx tsc --noEmit
+```
+
+This verifies that the project compiles at the TypeScript level without creating generated JavaScript output.
+
+---
+
+# Testing
+
+The project uses Vitest.
+
+Tests are stored in:
+
+```text
+tests/
+```
+
+The current task API test file is:
+
+```text
+tests/tasks.test.ts
+```
+
+The test suite currently contains three functional tests.
+
+The current result is:
+
+```text
+3/3 passing
+```
+
+---
+
+# Vitest
+
+Vitest is used because it provides a fast JavaScript and TypeScript testing environment.
+
+The project uses:
+
+```text
+vitest.config.mts
+```
+
+The configuration uses the Node environment.
+
+The project also defines the `@` alias for source files.
+
+---
+
+# Functional Tests
+
+The task tests mock authentication and database dependencies.
+
+The tests exercise actual API route handlers.
+
+The current tests cover:
+
+- GET task handling.
+- POST task handling.
+- DELETE task handling.
+
+This provides more meaningful coverage than testing only isolated helper functions.
+
+---
+
+# Test Flow
+
+The test process is:
+
+```text
+Test workflow starts
+        |
+        v
+Install dependencies
+        |
+        v
+Emit Prisma contract
+        |
+        v
+Run ESLint
+        |
+        v
+Run TypeScript
+        |
+        v
+Run Vitest
+        |
+        v
+Build application
+```
+
+---
+
+# Production Build
+
+The project has successfully produced a production build.
+
+The build output includes:
+
+```text
+○ /
+○ /_not-found
+ƒ /api/auth/[...nextauth]
+ƒ /api/tasks
+```
+
+The successful build confirms that the Next.js application can compile for production.
+
+---
+
+# GitHub
+
+The project source code is hosted on GitHub.
+
+Repository:
+
+```text
+https://github.com/Ahmed-31-Anwar/task-manager
+```
+
+GitHub is used for:
+
+- Source control.
+- Collaboration.
+- Pull requests.
+- Commit history.
+- GitHub Actions.
+- CI/CD.
+
+---
+
+# Git Workflow
+
+The project follows a standard Git workflow.
+
+A developer makes a change locally.
+
+The change is tested locally.
+
+The change is committed.
+
+The change is pushed to GitHub.
+
+Pull requests can be used to review changes.
+
+Changes merged into `main` enter the production pipeline.
+
+---
+
+# Basic Git Commands
+
+Check status:
+
+```bash
+git status
+```
+
+Check branches:
+
+```bash
+git branch
+```
+
+Create a branch:
+
+```bash
+git checkout -b feature-name
+```
+
+Stage files:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Describe the change"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Pull Requests
+
+Pull requests provide a controlled way to merge changes into `main`.
+
+The Build workflow runs for pull requests targeting `main`.
+
+This allows the project to validate the proposed change before it becomes part of the main branch.
+
+---
+
+# CI/CD
+
+CI/CD stands for:
+
+```text
+Continuous Integration
+Continuous Delivery
+Continuous Deployment
+```
+
+The project uses GitHub Actions to automate validation and release.
+
+---
+
+# Continuous Integration
+
+Continuous Integration means developers regularly integrate changes into a shared repository.
+
+The purpose is to detect problems early.
+
+In this project, CI includes:
+
+- Building the application.
+- Running ESLint.
+- Checking TypeScript.
+- Running tests.
+- Building again before release.
+
+---
+
+# Integration Hell
+
+Integration Hell occurs when developers work independently for long periods and then attempt to combine many changes at once.
+
+Large integration points can create:
+
+- Merge conflicts.
+- Unexpected behavior.
+- Difficult debugging.
+- Broken builds.
+- Hard-to-trace failures.
+
+Regular integration reduces these risks.
+
+---
+
+# Continuous Delivery
+
+Continuous Delivery means keeping the application in a state where it can be released reliably.
+
+The project validates changes automatically.
+
+The release workflow can then trigger a production deployment after the required checks succeed.
+
+---
+
+# Continuous Deployment
+
+Continuous Deployment goes one step further.
+
+Successful changes can automatically move into production.
+
+The current release workflow triggers the Vercel deployment after the Test workflow succeeds for `main`.
+
+---
+
+# Continuous Development
+
+Continuous Development refers to continuously improving the software through regular development cycles.
+
+The general cycle is:
+
+```text
+Plan
+  |
+  v
+Develop
+  |
+  v
+Test
+  |
+  v
+Review
+  |
+  v
+Release
+  |
+  v
+Improve
+```
+
+---
+
+# CI/CD Pipeline
+
+The project pipeline is:
+
+```text
+Developer
+    |
+    v
+GitHub
+    |
+    v
+Build
+    |
+    v
+Test
+    |
+    v
+Release
+    |
+    v
+Vercel
+    |
+    v
+Production
+```
+
+---
+
+# Pipeline Details
+
+The pipeline contains three GitHub Actions workflows.
+
+```text
+build.yml
+test.yml
+release.yml
+```
+
+They form a dependency chain.
 
 ```text
 Build
-  ↓
+  |
+  v
 Test
-  ↓
+  |
+  v
 Release
-```
-
-Each workflow has a different purpose.
-
-The Build workflow checks whether the application can successfully build.
-
-The Test workflow runs after the Build workflow succeeds and performs additional checks.
-
-The Release workflow runs after the Test workflow succeeds and is responsible for deploying the application to Vercel.
-
-The overall pipeline is:
-
-```text
-Pull Request
-      ↓
-Build
-      ↓
-Test
-      ↓
-Merge to Main
-      ↓
-Release
-      ↓
-Vercel Production
 ```
 
 ---
 
-## GitHub Actions
+# GitHub Actions
 
-GitHub Actions is used to automate the CI/CD process.
+GitHub Actions executes automated workflows.
 
-The workflow files are stored inside:
+Each workflow is stored inside:
 
 ```text
 .github/workflows/
 ```
 
-The project currently has three workflow files:
-
-```text
-.github/
-└── workflows/
-    ├── build.yml
-    ├── test.yml
-    └── release.yml
-```
-
-Each workflow is written in YAML and contains information about when it should run, what environment it should use, and which steps it should perform.
-
-The workflows are connected so that the Build stage is completed before the Test stage and the Test stage is completed before the Release stage.
-
----
-
-## Build Workflow
-
-The first workflow is:
+The project contains:
 
 ```text
 .github/workflows/build.yml
+.github/workflows/test.yml
+.github/workflows/release.yml
 ```
 
-The purpose of the Build workflow is to make sure that the application can successfully compile.
+---
 
-It runs when a pull request is opened or updated against the `main` branch.
+# Workflow Files
 
-The workflow follows this process:
+A GitHub Actions workflow is written in YAML.
+
+A workflow normally contains:
+
+- Name.
+- Trigger.
+- Jobs.
+- Runner.
+- Steps.
+- Actions.
+- Commands.
+- Environment variables.
+- Conditions.
+
+---
+
+# Build Workflow
+
+The Build workflow is named:
 
 ```text
-Pull Request
-      ↓
-Checkout Code
-      ↓
-Setup Node.js
-      ↓
-Install Dependencies
-      ↓
-Emit Prisma Contract
-      ↓
-Build Next.js Application
+Build
 ```
 
-The workflow uses:
+It runs when:
+
+- A pull request targets `main`.
+- Code is pushed to `main`.
+
+---
+
+# Build Workflow Triggers
+
+```yaml
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+```
+
+This means the Build workflow is not limited to pull requests.
+
+It also runs when changes are pushed directly to `main`.
+
+---
+
+# Build Workflow Environment
+
+The Build job receives:
+
+```text
+DATABASE_URL
+```
+
+through GitHub Secrets.
+
+The secret is exposed to the workflow as:
+
+```yaml
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+```
+
+---
+
+# Build Workflow Steps
+
+The Build workflow performs:
+
+1. Checkout.
+2. Node.js setup.
+3. Dependency installation.
+4. Prisma contract emission.
+5. Next.js production build.
+
+---
+
+# Build Workflow
 
 ```yaml
 name: Build
 
 on:
   pull_request:
+    branches:
+      - main
+  push:
     branches:
       - main
 
@@ -458,68 +1658,166 @@ jobs:
         run: npm run build
 ```
 
-The workflow uses Node.js 24, matching the Node.js version used for the project.
-
-The `DATABASE_URL` is provided through GitHub repository secrets so that the database connection does not have to be written directly into the workflow.
-
 ---
 
-## Why the Build Workflow Is Important
+# Build Runner
 
-The Build workflow provides an automatic check before changes are merged.
-
-If a change causes a problem with the application build, GitHub Actions can detect it during the pull request.
-
-For example, a build could fail because of:
-
-* A TypeScript problem
-* A missing dependency
-* An invalid configuration
-* A database configuration problem
-* A problem with a Next.js route
-* A Prisma configuration issue
-
-This gives a clear indication that the issue needs to be fixed before the changes are merged.
-
----
-
-## Test Workflow
-
-The second workflow is:
+The workflow uses:
 
 ```text
-.github/workflows/test.yml
+ubuntu-latest
 ```
 
-The Test workflow is connected to the Build workflow using `workflow_run`.
+This provides a clean GitHub-hosted environment.
 
-It waits for the Build workflow to finish before starting.
+---
 
-The flow is:
+# Node Version
+
+The Build workflow uses:
+
+```yaml
+node-version: 24
+```
+
+This matches the project's Node.js major version.
+
+---
+
+# npm Cache
+
+The workflow uses npm caching through:
+
+```yaml
+cache: npm
+```
+
+This helps reduce unnecessary dependency installation overhead.
+
+---
+
+# npm CI
+
+The Build workflow uses:
+
+```bash
+npm ci
+```
+
+instead of:
+
+```bash
+npm install
+```
+
+`npm ci` is intended for reproducible CI installations.
+
+---
+
+# Prisma Contract in Build
+
+The Build workflow runs:
+
+```bash
+npx prisma contract emit
+```
+
+before:
+
+```bash
+npm run build
+```
+
+This ensures the Prisma contract is available during the build.
+
+---
+
+# Test Workflow
+
+The Test workflow is named:
 
 ```text
-Build
-  ↓
-Build Successful
-  ↓
 Test
 ```
 
-The current Test workflow performs several automated checks:
+It is triggered through:
 
-```text
-Install Dependencies
-        ↓
-Emit Prisma Contract
-        ↓
-Run ESLint
-        ↓
-Check TypeScript
-        ↓
-Build Application
+```yaml
+workflow_run
 ```
 
-The workflow uses:
+It waits for the Build workflow to finish.
+
+---
+
+# Test Trigger
+
+The workflow listens for:
+
+```yaml
+workflow_run:
+  workflows:
+    - Build
+  types:
+    - completed
+```
+
+This means Test starts after Build finishes.
+
+---
+
+# Test Success Condition
+
+The Test job contains:
+
+```yaml
+if: ${{ github.event.workflow_run.conclusion == 'success' }}
+```
+
+Therefore the Test job runs only when Build succeeds.
+
+---
+
+# Test Checkout
+
+The Test workflow checks out:
+
+```yaml
+ref: ${{ github.event.workflow_run.head_sha }}
+```
+
+This is important because it makes the test workflow operate against the exact commit that triggered the Build workflow.
+
+---
+
+# Test Environment
+
+The Test workflow also receives:
+
+```text
+DATABASE_URL
+```
+
+from GitHub Secrets.
+
+---
+
+# Test Workflow Steps
+
+The Test workflow performs:
+
+1. Checkout.
+2. Node.js setup.
+3. Dependency installation.
+4. Prisma contract emission.
+5. ESLint.
+6. TypeScript validation.
+7. Vitest.
+8. Production build.
+
+---
+
+# Test Workflow
 
 ```yaml
 name: Test
@@ -562,115 +1860,133 @@ jobs:
       - name: Check TypeScript
         run: npx tsc --noEmit
 
+      - name: Run tests
+        run: npm test
+
       - name: Build application
         run: npm run build
 ```
 
 ---
 
-## Test Workflow Checks
+# Test Validation
 
-The Test workflow currently checks the project in several ways.
+The Test workflow validates:
 
-### ESLint
+```text
+ESLint
+TypeScript
+Vitest
+Production Build
+```
 
-ESLint checks the source code for linting issues.
+This creates multiple layers of validation.
+
+---
+
+# ESLint Check
+
+The workflow runs:
 
 ```bash
 npm run lint
 ```
 
-### TypeScript
+A successful result means the code passes the configured ESLint rules.
 
-TypeScript is checked using:
+---
+
+# TypeScript Check
+
+The workflow runs:
 
 ```bash
 npx tsc --noEmit
 ```
 
-This checks for type errors without creating a separate build output.
+This checks the project for TypeScript errors.
 
-### Prisma
+---
 
-The Prisma contract is emitted using:
+# Vitest Check
+
+The workflow runs:
 
 ```bash
-npx prisma contract emit
+npm test
 ```
 
-This prepares the Prisma database layer before the application is built.
+The current test suite has:
 
-### Production Build
+```text
+3/3 passing
+```
 
-The application is also built again using:
+---
+
+# Test Build
+
+The workflow finishes with:
 
 ```bash
 npm run build
 ```
 
-This provides another check that the application can successfully compile.
+This provides another production-build validation after the other checks.
 
 ---
 
-## Functional Testing
+# Release Workflow
 
-The current Test workflow focuses on automated code and build checks.
-
-It does not currently simulate a real user clicking the Add Task and Delete Task buttons in a browser.
-
-Browser-based functional testing could be added later using a testing framework such as Playwright.
-
-A future functional test could follow a flow such as:
+The Release workflow is named:
 
 ```text
-Open Application
-      ↓
-Sign In
-      ↓
-Create Task
-      ↓
-Check Task Appears
-      ↓
-Delete Task
-      ↓
-Check Task Disappears
-```
-
-For the current version, the Test workflow is focused on code quality, TypeScript, Prisma preparation, and the production build.
-
----
-
-## Release Workflow
-
-The third workflow is:
-
-```text
-.github/workflows/release.yml
-```
-
-The Release workflow is responsible for deploying the application to Vercel.
-
-It is connected to the Test workflow using `workflow_run`.
-
-The intended flow is:
-
-```text
-Build
-  ↓
-Test
-  ↓
-Test Successful
-  ↓
 Release
-  ↓
-Vercel Production
 ```
 
-The workflow is also restricted to the `main` branch.
+It runs after the Test workflow completes.
 
-This means that a feature branch can go through the Build and Test stages without automatically deploying that branch to production.
+---
 
-The workflow uses:
+# Release Trigger
+
+The Release workflow listens for:
+
+```yaml
+workflow_run:
+  workflows:
+    - Test
+  types:
+    - completed
+```
+
+---
+
+# Release Conditions
+
+The release job requires:
+
+```text
+Test succeeded
+```
+
+and:
+
+```text
+The workflow run came from main
+```
+
+The condition is:
+
+```yaml
+if: >
+  ${{ github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' }}
+```
+
+---
+
+# Release Workflow
 
 ```yaml
 name: Release
@@ -690,123 +2006,301 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel
-
-      - name: Deploy to Vercel
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Trigger Vercel deployment
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 ```
 
 ---
 
-## Release Conditions
+# Release Method
 
-The Release workflow has two important conditions.
+The current release workflow does not use the Vercel CLI.
 
-First, the Test workflow must complete successfully.
+It does not require the release workflow to authenticate with Vercel using a Vercel token.
 
-Second, the workflow must be associated with the `main` branch.
+Instead, GitHub Actions sends a POST request to a Vercel Deploy Hook.
 
-This keeps production deployment separate from normal feature branch development.
+The hook URL is stored as a GitHub Secret.
 
-The intended process is:
+---
+
+# Vercel Deploy Hook
+
+The project uses:
 
 ```text
-Feature Branch
-      ↓
-Pull Request
-      ↓
+VERCEL_DEPLOY_HOOK
+```
+
+as a GitHub Secret.
+
+The actual hook URL is intentionally not stored in this README.
+
+The Release workflow sends:
+
+```bash
+curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
+```
+
+---
+
+# Why the Deploy Hook Is Useful
+
+The Deploy Hook provides a simple connection between GitHub Actions and Vercel.
+
+The workflow does not need to expose the hook URL.
+
+GitHub stores the hook URL as a secret.
+
+The Release workflow retrieves it securely during execution.
+
+---
+
+# Workflow Dependency
+
+The three workflows form:
+
+```text
 Build
-      ↓
+  |
+  | success
+  v
 Test
-      ↓
-Merge to Main
-      ↓
+  |
+  | success + main
+  v
 Release
-      ↓
+  |
+  v
+Vercel
+```
+
+A failed Build stops the chain.
+
+A failed Test stops the Release stage.
+
+A successful Test on a non-main branch does not trigger the production Release job.
+
+---
+
+# Pull Request Flow
+
+For a pull request targeting `main`:
+
+```text
+Pull Request
+     |
+     v
+Build
+     |
+     v
+Validation
+```
+
+The Build workflow checks whether the application can build.
+
+The Test workflow can then run after a successful Build.
+
+The Release job does not run unless the workflow run is associated with `main`.
+
+---
+
+# Main Branch Flow
+
+For a successful push to `main`:
+
+```text
+Push to main
+     |
+     v
+Build
+     |
+     v
+Test
+     |
+     v
+Release
+     |
+     v
+Vercel
+     |
+     v
 Production
 ```
 
----
-
-## Vercel Deployment
-
-The Release workflow uses the Vercel CLI to deploy the application.
-
-The deployment command is:
-
-```bash
-vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
-```
-
-The `--prod` option is used to deploy to the production environment.
-
-The Vercel authentication token is stored as a GitHub repository secret instead of being placed directly inside the workflow file.
-
-This keeps the deployment token out of the source code.
+This is the main production release path.
 
 ---
 
-## GitHub Repository Secrets
+# CI/CD Pipeline Summary
 
-The GitHub Actions workflows require some values that should not be committed to the repository.
+| Stage | Workflow | Purpose |
+|---|---|---|
+| Build | Build | Compile application |
+| Test | Test | Validate quality and tests |
+| Release | Release | Trigger Vercel deployment |
 
-These values are stored using GitHub repository secrets.
+---
 
-The main secrets used by the workflows are:
+# GitHub Secrets
+
+The current GitHub Actions workflows use:
 
 ```text
 DATABASE_URL
-VERCEL_TOKEN
+VERCEL_DEPLOY_HOOK
 ```
 
-### DATABASE_URL
-
-`DATABASE_URL` contains the PostgreSQL connection string used by Prisma.
-
-The secret name is:
-
-```text
-DATABASE_URL
-```
-
-The secret value should contain only the actual PostgreSQL connection URL.
-
-It should not include:
-
-```text
-DATABASE_URL=
-```
-
-and it should not include the quotation marks from the `.env.local` file.
-
-### VERCEL_TOKEN
-
-`VERCEL_TOKEN` contains the authentication token used by the Vercel CLI.
-
-GitHub Actions uses this token when running the production deployment command.
-
-The token is kept inside GitHub Secrets instead of being written into `release.yml`.
+These values are stored in GitHub Secrets.
 
 ---
 
-## Environment Variables
+# DATABASE_URL Secret
 
-The project uses environment variables for configuration and sensitive values.
+`DATABASE_URL` allows GitHub Actions to access the database configuration required during Prisma and Next.js build operations.
+
+The value should match the appropriate Neon PostgreSQL connection.
+
+---
+
+# VERCEL_DEPLOY_HOOK Secret
+
+`VERCEL_DEPLOY_HOOK` stores the Vercel Deploy Hook.
+
+The actual URL should never be written into workflow source code.
+
+The workflow references:
+
+```yaml
+${{ secrets.VERCEL_DEPLOY_HOOK }}
+```
+
+---
+
+# Vercel
+
+Vercel hosts the production application.
+
+The project is connected to the GitHub repository.
+
+The Vercel project is named:
+
+```text
+task-manager
+```
+
+The production deployment is available at:
+
+```text
+https://task-manager-nine-khaki-16.vercel.app
+```
+
+---
+
+# Vercel Project
+
+The project is associated with the Vercel team:
+
+```text
+Muhammad Ahmed Anwar
+```
+
+The Vercel project identifier is managed by Vercel.
+
+Sensitive Vercel identifiers and credentials should not be treated as application configuration.
+
+---
+
+# Production Environment Variables
+
+The Vercel production environment requires the application's production environment variables.
+
+These include:
+
+```text
+DATABASE_URL
+AUTH_SECRET
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+```
+
+---
+
+# Vercel Deployment
+
+The current GitHub Actions release mechanism uses the Vercel Deploy Hook.
+
+The process is:
+
+```text
+GitHub Actions
+      |
+      v
+Successful Test
+      |
+      v
+Release workflow
+      |
+      v
+POST request
+      |
+      v
+Vercel Deploy Hook
+      |
+      v
+Vercel deployment
+```
+
+---
+
+# Vercel CLI
+
+The project previously used an interactive Vercel CLI deployment during setup.
+
+The current GitHub Actions release workflow does not depend on the Vercel CLI.
+
+The current release mechanism is:
+
+```text
+GitHub Actions
++
+Vercel Deploy Hook
+```
+
+---
+
+# Google OAuth Production Configuration
+
+Production authentication requires the production callback URL to be configured with Google.
+
+The production application URL is:
+
+```text
+https://task-manager-nine-khaki-16.vercel.app
+```
+
+The appropriate Google OAuth callback must correspond to the deployed authentication route.
+
+The exact callback configured for the deployed application should be kept consistent with the current production deployment.
+
+---
+
+# OAuth Troubleshooting
+
+If Google sign-in fails after deployment, check:
+
+1. Production environment variables.
+2. Google Client ID.
+3. Google Client Secret.
+4. Authentication secret.
+5. OAuth callback URL.
+6. Deployment URL.
+7. Google OAuth configuration.
+8. Vercel environment settings.
+
+---
+
+# Local vs Production
 
 Local development uses:
 
@@ -814,139 +2308,823 @@ Local development uses:
 .env.local
 ```
 
-GitHub Actions uses:
+Production uses environment variables configured in Vercel.
 
-```text
-GitHub Repository Secrets
-```
+GitHub Actions uses GitHub Secrets.
 
-Vercel uses:
-
-```text
-Vercel Environment Variables
-```
-
-This keeps sensitive configuration separate from the application source code.
-
-Values such as database credentials, Google OAuth credentials, and deployment tokens should never be committed to GitHub.
+These environments should not rely on committed secrets.
 
 ---
 
-## Git & GitHub Workflow
+# Environment Separation
 
-Git was used throughout the project to keep track of changes and work with different versions of the code.
-
-The project repository is hosted on GitHub:
+The basic model is:
 
 ```text
-https://github.com/Ahmed-31-Anwar/task-manager
+Local
+  |
+  +---- .env.local
+
+GitHub Actions
+  |
+  +---- GitHub Secrets
+
+Vercel
+  |
+  +---- Vercel Environment Variables
 ```
 
-The general workflow is:
-
-```text
-Make Changes
-      ↓
-Test Locally
-      ↓
-Git Add
-      ↓
-Git Commit
-      ↓
-Git Push
-      ↓
-GitHub
-```
-
-For larger changes, a separate branch can be created instead of making the changes directly on `main`.
+Each environment has its own secure configuration.
 
 ---
 
-## Branches
+# Troubleshooting
 
-Branches allow changes to be developed separately from the main branch.
+Troubleshooting should begin by identifying which layer is failing.
 
-For the CI/CD work, a separate branch was used:
+The main layers are:
 
 ```text
-test-build-workflow
+Frontend
+Backend
+Authentication
+Database
+Prisma
+Testing
+GitHub Actions
+Vercel
 ```
-
-The workflow changes were pushed to GitHub and then used to create a pull request into `main`.
-
-This allowed the GitHub Actions workflows to be tested before the changes were merged into the main branch.
 
 ---
 
-## Pull Requests
+# Troubleshooting Order
 
-Pull requests were used to review and test changes before merging them into `main`.
+A useful troubleshooting sequence is:
 
-The general process was:
-
-```text
-Create Feature Branch
-        ↓
-Make Changes
-        ↓
-Push Branch
-        ↓
-Open Pull Request
-        ↓
-Build Workflow
-        ↓
-Test Workflow
-        ↓
-Review
-        ↓
-Merge
-```
-
-The Build workflow is triggered when the pull request targets the `main` branch.
-
-This makes the pull request an important part of the CI/CD process.
+1. Check the exact error.
+2. Identify the environment.
+3. Reproduce locally if possible.
+4. Check environment variables.
+5. Check dependency versions.
+6. Check GitHub Actions logs.
+7. Check Vercel logs.
+8. Check database connectivity.
+9. Check authentication configuration.
+10. Re-run the affected step.
 
 ---
 
-## CI/CD Workflow Testing
+# Prisma Troubleshooting
 
-The CI/CD pipeline itself needed to be tested after the workflows were created.
+One important issue during development was Prisma command compatibility.
 
-The first step was creating a separate branch and opening a pull request into `main`.
+The project uses Prisma 8 release candidate tooling.
 
-The Build workflow initially failed because it was using an older Prisma command:
-
-```bash
-npx prisma generate
-```
-
-The version of Prisma used in the project does not provide that command.
-
-The workflow was changed to:
+The correct project command is:
 
 ```bash
 npx prisma contract emit
 ```
 
-After making this change, the workflow was able to move further through the build process.
+Do not automatically replace it with older Prisma commands.
 
 ---
 
-## Database Configuration Issue
+# Prisma Build Failure
 
-Another issue occurred because GitHub Actions does not automatically have access to the local `.env.local` file.
+If the build fails around Prisma:
 
-The local computer had the database connection available, but the GitHub Actions runner did not.
+Check:
 
-This caused the build to fail because the PostgreSQL database configuration was missing.
+```text
+prisma.config.ts
+```
 
-The solution was to add the database connection string as a GitHub repository secret:
+Check:
+
+```text
+prisma/contract.prisma
+```
+
+Check:
 
 ```text
 DATABASE_URL
 ```
 
-The Build and Test workflows then make the secret available through:
+Then run:
+
+```bash
+npx prisma contract emit
+```
+
+After that run:
+
+```bash
+npm run build
+```
+
+---
+
+# Database Troubleshooting
+
+If the database connection fails:
+
+Check:
+
+```text
+DATABASE_URL
+```
+
+Check whether the Neon database is available.
+
+Check whether the connection string is correct.
+
+Check whether the environment contains the variable.
+
+For GitHub Actions, check:
+
+```text
+GitHub Settings
+  >
+Secrets and variables
+  >
+Actions
+```
+
+---
+
+# Missing DATABASE_URL
+
+If Prisma reports that the database URL is missing:
+
+Check `.env.local`.
+
+The file should contain:
+
+```env
+DATABASE_URL="your-database-url"
+```
+
+For GitHub Actions, confirm:
+
+```text
+DATABASE_URL
+```
+
+exists as a GitHub Secret.
+
+---
+
+# Authentication Troubleshooting
+
+If authentication fails locally:
+
+Check:
+
+```text
+AUTH_SECRET
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+```
+
+Then check the Google OAuth configuration.
+
+---
+
+# Google Callback Troubleshooting
+
+If Google redirects incorrectly:
+
+Check the callback URL registered with Google.
+
+Check the current deployment URL.
+
+Check whether the production domain changed.
+
+Check whether the authentication route is:
+
+```text
+/api/auth/
+```
+
+---
+
+# Session Troubleshooting
+
+If the user appears logged out:
+
+Check:
+
+- Authentication configuration.
+- `AUTH_SECRET`.
+- Google OAuth credentials.
+- Browser cookies.
+- Deployment environment variables.
+- Production callback configuration.
+
+---
+
+# Task API Troubleshooting
+
+If tasks do not load:
+
+Check:
+
+1. User authentication.
+2. Session availability.
+3. API route.
+4. Database connection.
+5. Prisma configuration.
+6. Browser network requests.
+7. Vercel logs.
+
+---
+
+# Task Creation Troubleshooting
+
+If tasks cannot be created:
+
+Check:
+
+- Authentication.
+- Request body.
+- API route.
+- Database connection.
+- User identity.
+- Server logs.
+
+---
+
+# Task Deletion Troubleshooting
+
+If deletion fails:
+
+Check:
+
+- Task ID.
+- Authentication.
+- Ownership verification.
+- API route.
+- Database connection.
+
+---
+
+# GitHub Actions Troubleshooting
+
+When a workflow fails:
+
+Open:
+
+```text
+GitHub
+  >
+Actions
+```
+
+Select the failed workflow.
+
+Open the failed job.
+
+Open the failed step.
+
+Read the first meaningful error.
+
+Avoid focusing only on the final generic failure message.
+
+---
+
+# Build Workflow Failure
+
+If Build fails:
+
+Check:
+
+```text
+npm ci
+```
+
+Then:
+
+```text
+npx prisma contract emit
+```
+
+Then:
+
+```text
+npm run build
+```
+
+Try the same commands locally.
+
+---
+
+# Test Workflow Failure
+
+If Test fails:
+
+Check:
+
+```bash
+npm run lint
+```
+
+Then:
+
+```bash
+npx tsc --noEmit
+```
+
+Then:
+
+```bash
+npm test
+```
+
+Then:
+
+```bash
+npm run build
+```
+
+This identifies which validation layer is failing.
+
+---
+
+# Release Workflow Failure
+
+If Release fails:
+
+Check:
+
+```text
+Test workflow result
+```
+
+Then:
+
+```text
+head_branch
+```
+
+Then:
+
+```text
+VERCEL_DEPLOY_HOOK
+```
+
+Then check Vercel.
+
+---
+
+# Release Branch Condition
+
+The Release workflow only proceeds when:
+
+```text
+Test succeeded
+```
+
+and:
+
+```text
+head_branch == main
+```
+
+A successful Test run from another branch should not trigger the production release job.
+
+---
+
+# Vercel Troubleshooting
+
+If Vercel does not deploy:
+
+Check:
+
+1. Vercel project exists.
+2. Deploy Hook exists.
+3. Deploy Hook targets the correct project.
+4. Deploy Hook targets the intended branch.
+5. `VERCEL_DEPLOY_HOOK` exists in GitHub Secrets.
+6. Release workflow succeeded.
+7. Vercel deployment logs.
+
+---
+
+# Deploy Hook Security
+
+The Deploy Hook URL is sensitive.
+
+Do not:
+
+- Commit it.
+- Put it in README.
+- Put it in source code.
+- Post it publicly.
+- Put it in issue comments.
+- Put it in screenshots.
+
+Use GitHub Secrets.
+
+---
+
+# ESLint Generated File Issue
+
+The project previously encountered linting issues caused by generated Prisma files.
+
+The solution was to ignore generated Prisma files.
+
+The ESLint configuration includes:
+
+```text
+prisma/contract.d.ts
+```
+
+and generated migration and skill directories.
+
+This keeps generated files outside the normal application linting scope.
+
+---
+
+# Commit
+
+The ESLint configuration change was committed with:
+
+```text
+1423d63
+```
+
+Commit message:
+
+```text
+Ignore generated Prisma files in ESLint
+```
+
+---
+
+# CI History
+
+The project evolved through several CI/CD changes.
+
+Important commits included:
+
+```text
+290b95c
+Add functional tests to CI
+```
+
+```text
+1423d63
+Ignore generated Prisma files in ESLint
+```
+
+```text
+f7c1c80
+Confirm Vercel deployment automatically
+```
+
+```text
+2130bd6
+Run build on main pushes
+```
+
+```text
+1f2287c
+Trigger CI pipeline
+```
+
+```text
+647ace5
+Configure Vercel deployment IDs
+```
+
+---
+
+# CI Development Lessons
+
+The project demonstrated several important CI/CD concepts.
+
+A successful local build does not automatically guarantee CI success.
+
+CI runs in a clean environment.
+
+Environment variables must therefore be configured separately.
+
+Generated files must be handled correctly.
+
+Dependencies must be installed consistently.
+
+Tests should be automated.
+
+Production builds should be validated before release.
+
+---
+
+# Security Practices
+
+Security is important throughout the project.
+
+Sensitive configuration should never be hard-coded.
+
+Use:
+
+```text
+.env.local
+```
+
+for local secrets.
+
+Use:
+
+```text
+GitHub Secrets
+```
+
+for GitHub Actions secrets.
+
+Use:
+
+```text
+Vercel Environment Variables
+```
+
+for production configuration.
+
+---
+
+# Secrets That Must Not Be Committed
+
+Never commit:
+
+```text
+DATABASE_URL
+AUTH_SECRET
+AUTH_GOOGLE_SECRET
+VERCEL_DEPLOY_HOOK
+```
+
+Do not commit:
+
+```text
+.env.local
+```
+
+---
+
+# Gitignore
+
+The project should keep sensitive local files outside version control.
+
+The `.gitignore` file is therefore important.
+
+Check it before committing environment-related changes.
+
+---
+
+# Dependency Management
+
+Dependencies are defined in:
+
+```text
+package.json
+```
+
+The lockfile provides reproducible dependency resolution.
+
+CI uses:
+
+```bash
+npm ci
+```
+
+This makes the CI installation more predictable.
+
+---
+
+# package.json
+
+The main scripts are:
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "postinstall": "prisma skills sync || exit 0"
+  }
+}
+```
+
+---
+
+# Development Command Reference
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start development |
+| `npm run build` | Create production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run Vitest |
+| `npx tsc --noEmit` | TypeScript check |
+| `npx prisma contract emit` | Emit Prisma contract |
+
+---
+
+# Git Command Reference
+
+## Status
+
+```bash
+git status
+```
+
+Shows changed files.
+
+---
+
+## Add
+
+```bash
+git add .
+```
+
+Stages changes.
+
+---
+
+## Commit
+
+```bash
+git commit -m "Describe change"
+```
+
+Creates a commit.
+
+---
+
+## Push
+
+```bash
+git push
+```
+
+Pushes changes.
+
+---
+
+## Pull
+
+```bash
+git pull
+```
+
+Downloads and integrates changes.
+
+---
+
+## Log
+
+```bash
+git log --oneline
+```
+
+Shows compact commit history.
+
+---
+
+## Branches
+
+```bash
+git branch
+```
+
+Lists branches.
+
+---
+
+## Create Branch
+
+```bash
+git checkout -b feature-name
+```
+
+Creates and switches to a branch.
+
+---
+
+# GitHub Actions Reference
+
+A workflow normally contains:
+
+```yaml
+name: Example
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run command
+        run: npm test
+```
+
+---
+
+# Workflow Components
+
+## `name`
+
+Defines the workflow name.
+
+Example:
+
+```yaml
+name: Build
+```
+
+---
+
+## `on`
+
+Defines when the workflow runs.
+
+Example:
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+```
+
+---
+
+## `jobs`
+
+Defines jobs inside the workflow.
+
+---
+
+## `runs-on`
+
+Defines the GitHub-hosted runner.
+
+Example:
+
+```yaml
+runs-on: ubuntu-latest
+```
+
+---
+
+## `steps`
+
+Defines individual operations.
+
+---
+
+## `uses`
+
+Uses a reusable GitHub Action.
+
+Example:
+
+```yaml
+uses: actions/checkout@v6
+```
+
+---
+
+## `run`
+
+Runs a shell command.
+
+Example:
+
+```yaml
+run: npm test
+```
+
+---
+
+## `env`
+
+Defines environment variables.
+
+Example:
 
 ```yaml
 env:
@@ -955,716 +3133,1171 @@ env:
 
 ---
 
-## Invalid Database URL Issue
+## `secrets`
 
-After adding the database secret, another issue appeared.
+References GitHub Secrets.
 
-The entire `.env.local` line had initially been copied into the GitHub secret:
-
-```text
-DATABASE_URL="..."
-```
-
-This caused the database URL to be interpreted incorrectly.
-
-The secret was corrected so that the name was:
-
-```text
-DATABASE_URL
-```
-
-and the value contained only the actual PostgreSQL connection string.
-
-After correcting the secret, the Build workflow completed successfully.
-
-This was a useful example of how environment variables need to be configured correctly when moving from local development to a CI environment.
-
----
-
-## Build Workflow Result
-
-After fixing the Prisma command and database configuration, the Build workflow successfully completed.
-
-The successful build confirmed that:
-
-* Dependencies could be installed
-* Prisma could be prepared
-* The database URL was available
-* The Next.js application could compile
-* TypeScript could complete successfully during the build
-* The application routes could be generated
-
-This allowed the CI/CD process to continue to the Test stage.
-
----
-
-## Test Workflow Result
-
-After the Build workflow was working, the Test workflow was added.
-
-The Test workflow waits for the Build workflow to complete successfully.
-
-It then performs the configured checks:
-
-```text
-Prisma Contract
-      ↓
-ESLint
-      ↓
-TypeScript
-      ↓
-Production Build
-```
-
-The Test workflow was successfully executed after it was added to the repository.
-
----
-
-## Release Workflow Setup
-
-The Release workflow was added after the Build and Test workflows were working.
-
-A Vercel token was created and stored in GitHub as:
-
-```text
-VERCEL_TOKEN
-```
-
-The Release workflow uses this token to authenticate with Vercel.
-
-The release job is restricted to the `main` branch so that production deployment is not triggered from an ordinary feature branch.
-
----
-
-## Vercel Preview vs Production
-
-The project also uses Vercel's GitHub integration.
-
-When a pull request is opened, Vercel can create a preview deployment.
-
-A preview deployment is different from the production deployment handled by the Release workflow.
-
-The general difference is:
-
-```text
-Pull Request
-      ↓
-Vercel Preview
-```
-
-and:
-
-```text
-Main Branch
-      ↓
-Release Workflow
-      ↓
-Vercel Production
-```
-
-The CI/CD Release workflow is specifically intended for the production deployment stage.
-
----
-
-## Debugging & Error Fixes
-
-A significant part of building the project was fixing issues that appeared during development.
-
-Some of the problems encountered included:
-
-* Prisma CLI command differences
-* Missing environment variables
-* Invalid database URL configuration
-* GitHub Actions environment configuration
-* Google OAuth callback configuration
-* Vercel deployment configuration
-* Pull request workflow setup
-* CI/CD workflow dependencies
-
-These issues helped make the project more practical because they showed how the application behaves outside the local development environment.
-
----
-
-## Google OAuth Redirect Configuration
-
-During deployment, Google OAuth required the correct production callback URL.
-
-The callback URL needs to point to the deployed application:
-
-```text
-https://your-domain.com/api/auth/callback/google
-```
-
-If the callback URL configured in Google does not match the URL being used by the application, Google can reject the authentication request.
-
-The correct Vercel production URL therefore needs to be added to the Google OAuth client's authorized redirect URIs.
-
-After configuring the correct callback URL, Google sign-in worked successfully on the deployed application.
-
----
-
-## Local Testing
-
-Before pushing changes to GitHub, the application can be tested locally.
-
-The development server can be started with:
-
-```bash
-npm run dev
-```
-
-The production build can be tested with:
-
-```bash
-npm run build
-```
-
-Linting can be checked with:
-
-```bash
-npm run lint
-```
-
-TypeScript can be checked with:
-
-```bash
-npx tsc --noEmit
-```
-
-The Prisma contract can be emitted with:
-
-```bash
-npx prisma contract emit
-```
-
-Running these commands locally helps catch problems before pushing changes to GitHub.
-
----
-
-## Multiple Account Testing
-
-The application is designed around user-specific tasks.
-
-This means that different Google accounts should have separate task lists.
-
-For example:
-
-```text
-Account A
-    ↓
-Task A1
-Task A2
-```
-
-and:
-
-```text
-Account B
-    ↓
-Task B1
-Task B2
-```
-
-Account A should not see Account B's tasks.
-
-This separation is handled through the authenticated user's ID and the relationship between the `User` and `Task` records in the database.
-
----
-
-## Task IDs
-
-Each task has its own database ID.
-
-The task ID is a global database identifier and is not simply the number of tasks belonging to a particular user.
-
-For example, a user could see:
-
-```text
-Task #18
-```
-
-even if they only have one task.
-
-This can happen because IDs 1 through 17 may have already been used by other task records.
-
-The actual number of tasks belonging to the current user is calculated separately by the application.
-
----
-
-## API Routes
-
-The application uses Next.js API routes to communicate between the frontend and the database.
-
-The task API handles operations such as:
-
-```text
-GET
-↓
-Get the current user's tasks
-
-POST
-↓
-Create a new task
-
-DELETE
-↓
-Delete a task
-```
-
-The API uses the authenticated session to determine which user's data should be accessed.
-
-This means that the frontend does not simply request every task in the database.
-
-Instead, the server identifies the current user and works with that user's tasks.
-
----
-
-## Task Creation
-
-When a user enters a task and submits it, the frontend sends the information to the task API.
-
-The API checks the current session before creating the task.
-
-The new task is then saved to PostgreSQL and associated with the user's ID.
-
-The task can then be displayed in the dashboard.
-
-The general flow is:
-
-```text
-User enters task
-      ↓
-Frontend sends request
-      ↓
-API checks session
-      ↓
-Task is created
-      ↓
-PostgreSQL stores task
-      ↓
-Task appears in dashboard
-```
-
----
-
-## Task Deletion
-
-Deleting a task follows a similar process.
-
-The user selects the delete option for a task.
-
-The frontend sends a delete request to the API.
-
-The API identifies the task and verifies the current session before removing it.
-
-The task is then deleted from the database and removed from the displayed list.
-
-The general flow is:
-
-```text
-User selects Delete
-      ↓
-Frontend sends request
-      ↓
-API checks session
-      ↓
-Task is deleted
-      ↓
-Database is updated
-      ↓
-Task disappears from dashboard
-```
-
----
-
-## Persistent Storage
-
-One of the main differences between a simple frontend-only task list and this project is persistent storage.
-
-The tasks are not only kept in the browser.
-
-They are stored in PostgreSQL.
-
-This means that after signing out and later signing back in with the same Google account, the user's previously created tasks can still be retrieved from the database.
-
-The flow is:
-
-```text
-Create Task
-      ↓
-PostgreSQL
-      ↓
-Sign Out
-      ↓
-Sign In Again
-      ↓
-Retrieve Tasks
-```
-
----
-
-## Dark Dashboard
-
-The application uses a dark dashboard design.
-
-The interface was kept relatively simple so that the main purpose of the application remains clear.
-
-The dashboard focuses on:
-
-* The signed-in user
-* The task input
-* The current task count
-* The task list
-* Delete controls
-* Sign-out functionality
-
-The goal was not to make the interface overly complicated, but to create something that is comfortable to use while still looking modern.
-
----
-
-## Production Build
-
-The production build uses:
-
-```bash
-npm run build
-```
-
-The build process checks that the Next.js application can compile successfully.
-
-During development of the CI/CD pipeline, the production build became an important part of the automated checks.
-
-The Build workflow runs it as the main build stage.
-
-The Test workflow also runs the build after its other checks.
-
-This gives the project multiple points where a build failure can be detected before production deployment.
-
----
-
-## Dependencies
-
-The project uses npm to manage its dependencies.
-
-Dependencies are installed locally using:
-
-```bash
-npm install
-```
-
-GitHub Actions uses:
-
-```bash
-npm ci
-```
-
-`npm ci` is useful in CI environments because it installs the dependencies from the lockfile in a clean and repeatable way.
-
-The project uses Node.js 24 as its development and CI environment.
-
----
-
-## Why Separate Workflows Were Used
-
-The CI/CD pipeline could have been placed into one large workflow, but the project uses three separate workflow files.
-
-This makes the stages easier to understand:
-
-```text
-build.yml
-    ↓
-test.yml
-    ↓
-release.yml
-```
-
-Each workflow has a specific responsibility.
-
-### Build
-
-Checks whether the application can build.
-
-### Test
-
-Runs the configured checks after a successful build.
-
-### Release
-
-Deploys to production after the Test stage succeeds and the code is on the main branch.
-
-This structure also makes it easier to identify which stage has failed.
-
----
-
-## Workflow Dependencies
-
-The workflows are connected using `workflow_run`.
-
-The Test workflow listens for the Build workflow:
+Example:
 
 ```yaml
-on:
-  workflow_run:
-    workflows:
-      - Build
-    types:
-      - completed
+${{ secrets.DATABASE_URL }}
 ```
 
-The Test job then checks whether the Build workflow completed successfully.
+---
 
-The Release workflow listens for the Test workflow:
+# CI/CD Concepts
 
-```yaml
-on:
-  workflow_run:
-    workflows:
-      - Test
-    types:
-      - completed
-```
+## Commit
 
-The Release job checks both the workflow result and the branch.
+A commit records a change in Git.
 
-This creates the dependency:
+---
+
+## Push
+
+A push sends local commits to a remote repository.
+
+---
+
+## Build
+
+The build process converts the source project into a deployable production application.
+
+---
+
+## Test
+
+Tests verify expected behavior.
+
+---
+
+## Release
+
+Release makes a validated version available for deployment.
+
+---
+
+## Deployment
+
+Deployment makes the application available on the production hosting platform.
+
+---
+
+# Development Checklist
+
+Before pushing changes:
+
+- [ ] Application starts locally.
+- [ ] Feature works locally.
+- [ ] No obvious console errors.
+- [ ] Authentication works.
+- [ ] Database works.
+- [ ] Tasks can be created.
+- [ ] Tasks can be deleted.
+- [ ] `npm run lint` passes.
+- [ ] `npx tsc --noEmit` passes.
+- [ ] `npm test` passes.
+- [ ] `npm run build` passes.
+
+---
+
+# Testing Checklist
+
+Before merging:
+
+- [ ] Tests pass.
+- [ ] ESLint passes.
+- [ ] TypeScript passes.
+- [ ] Production build passes.
+- [ ] Authentication has been checked.
+- [ ] API behavior has been checked.
+- [ ] Database behavior has been checked.
+
+---
+
+# Deployment Checklist
+
+Before production:
+
+- [ ] GitHub repository is updated.
+- [ ] `main` contains the intended changes.
+- [ ] Build succeeds.
+- [ ] Test succeeds.
+- [ ] Release succeeds.
+- [ ] Vercel deployment succeeds.
+- [ ] Production URL loads.
+- [ ] Google sign-in works.
+- [ ] Tasks can be created.
+- [ ] Tasks can be deleted.
+- [ ] Database persistence works.
+
+---
+
+# Production Verification
+
+After deployment:
+
+1. Open the production URL.
+2. Check that the page loads.
+3. Sign in with Google.
+4. Confirm the authenticated state.
+5. Add a task.
+6. Confirm the task appears.
+7. Refresh the page.
+8. Confirm persistence.
+9. Delete the task.
+10. Confirm deletion.
+11. Sign out.
+
+---
+
+# CI Verification
+
+A successful production release should have:
 
 ```text
-Build
-  ↓
-must succeed
-  ↓
-Test
-  ↓
-must succeed
-  ↓
-Release
+Build: Success
+Test: Success
+Release: Success
+Vercel: Success
 ```
 
 ---
 
-## Why CI/CD Is Useful
+# Current CI/CD Status
 
-Without CI/CD, a typical process could look like:
+The complete pipeline is operational.
+
+The Build workflow works.
+
+The Test workflow works.
+
+The Release workflow works.
+
+The Vercel deployment is triggered successfully.
+
+The application has successfully released to production.
+
+---
+
+# Current Test Status
+
+The current functional test suite reports:
 
 ```text
-Write Code
-   ↓
-Push Code
-   ↓
-Remember to Test
-   ↓
-Remember to Build
-   ↓
-Deploy Manually
+3/3 passing
 ```
 
-With the workflow in place, the process becomes more structured:
+The tests cover the task API handlers.
+
+---
+
+# Current Build Status
+
+The production build succeeds.
+
+The application compiles successfully with Next.js 16.3.3.
+
+The build includes:
 
 ```text
-Write Code
-   ↓
-Pull Request
-   ↓
-Automatic Build
-   ↓
-Automatic Checks
-   ↓
-Merge
-   ↓
-Production Release
+/
 ```
-
-This reduces the number of manual steps involved in checking and releasing the application.
-
-It also provides a record of whether the automated checks passed or failed.
-
----
-
-## CI/CD Concepts Used
-
-While setting up the project, I also worked with several concepts related to CI/CD.
-
-### Continuous Integration
-
-Continuous Integration is the practice of regularly integrating code changes and automatically checking them.
-
-In this project, pull requests trigger the Build workflow.
-
-### Continuous Delivery
-
-Continuous Delivery means keeping the application in a state where it can be released after passing the required checks.
-
-The Build and Test stages help verify that the application is ready for release.
-
-### Continuous Deployment
-
-Continuous Deployment takes the process one step further by automatically deploying changes after the required checks succeed.
-
-The Release workflow is designed around this idea for the production deployment.
-
-### Continuous Development
-
-Continuous Development focuses on the ongoing process of developing, improving, testing, and updating an application.
-
-The project follows this general cycle as new features and fixes are added.
-
----
-
-## CI/CD Pipeline Summary
-
-The complete pipeline can be summarized as:
 
 ```text
-Developer
-    ↓
-Makes Changes
-    ↓
-Pushes Feature Branch
-    ↓
-Opens Pull Request
-    ↓
-Build Workflow
-    ↓
-Application Builds Successfully
-    ↓
-Test Workflow
-    ↓
-Checks Pass
-    ↓
-Pull Request Merged
-    ↓
-Main Branch
-    ↓
-Release Workflow
-    ↓
-Vercel Production
+/_not-found
 ```
-
-This gives the project a clear path from development to production.
-
----
-
-## Lessons From Debugging
-
-The CI/CD setup also showed that a project that works locally can still fail in a CI environment.
-
-Local development had access to:
 
 ```text
-.env.local
+/api/auth/[...nextauth]
 ```
-
-while GitHub Actions did not.
-
-This meant that environment variables needed to be configured separately.
-
-Similarly, commands available in one version of a tool may not be available in another version.
-
-The Prisma command issue was an example of this.
-
-These problems made it clear that understanding the actual tools and versions being used is important when building automated workflows.
-
----
-
-## What I Learned
-
-This project was built as a practical way to work through the different parts of a full-stack application rather than focusing on just the frontend.
-
-Some of the main areas I worked with were:
-
-* Building interfaces with React and Next.js
-* Creating API routes
-* Working with TypeScript
-* Implementing Google OAuth
-* Managing user sessions
-* Designing a relational database
-* Using Prisma with PostgreSQL
-* Connecting a hosted database
-* Using environment variables
-* Using Git and GitHub for version control
-* Working with branches and pull requests
-* Understanding GitHub Actions
-* Creating workflow files using YAML
-* Understanding workflow triggers
-* Working with jobs and steps
-* Using GitHub Actions runners
-* Using `uses` steps
-* Using `run` commands
-* Building a CI/CD pipeline
-* Separating Build, Test, and Release stages
-* Using GitHub repository secrets
-* Connecting GitHub Actions with Vercel
-* Building and testing a production application
-* Deploying the project through Vercel
-
-The project also went through a number of debugging and deployment issues along the way, which made the development process a useful part of the learning experience.
-
----
-
-## Current Status
-
-The application is currently functional and supports the complete basic task-management flow:
-
-**Sign in → Create tasks → View tasks → Delete tasks → Sign out → Sign back in**
-
-Tasks are persisted in PostgreSQL and remain associated with the account that created them.
-
-The application is deployed through Vercel and uses Neon for PostgreSQL storage.
-
-The GitHub repository also contains the CI/CD workflow files for:
 
 ```text
-Build
-Test
-Release
+/api/tasks
 ```
 
-The Build workflow checks pull requests, the Test workflow runs after a successful Build workflow, and the Release workflow is configured to deploy the main branch to Vercel after the required checks succeed.
+---
+
+# Current Deployment
+
+Production URL:
+
+```text
+https://task-manager-nine-khaki-16.vercel.app
+```
 
 ---
 
-## Future Improvements
+# Repository
 
-There are still several areas that could be expanded in the future.
-
-Some possible improvements include:
-
-* Edit existing tasks
-* Mark tasks as completed
-* Add task due dates
-* Add task priorities
-* Add categories
-* Add search and filtering
-* Improve mobile responsiveness
-* Add more detailed automated functional tests
-* Add browser-based testing with Playwright
-* Add stronger error handling
-* Add loading states
-* Add better empty-state messages
-* Add more detailed task information
-* Add additional authentication providers
-* Improve the CI/CD test stage
-
-The current version focuses on getting the core task-management functionality and deployment pipeline working first.
-
----
-
-## Repository
-
-The project is available on GitHub:
+GitHub repository:
 
 ```text
 https://github.com/Ahmed-31-Anwar/task-manager
 ```
 
-The repository contains the application source code, configuration files, Prisma setup, and GitHub Actions workflows used by the project.
+---
+
+# Local Project
+
+Local project directory:
+
+```text
+C:\Users\F-05\Desktop\Projects\task-manager
+```
 
 ---
 
-## Author
+# Release Architecture
 
-**Ahmed Anwar**
+The release architecture is:
 
-This project was built as a practical full-stack web development project and is part of my ongoing learning and development in software engineering.
+```text
+Local Development
+        |
+        v
+       Git
+        |
+        v
+     GitHub
+        |
+        v
+     Build
+        |
+        v
+      Test
+        |
+        v
+    Release
+        |
+        v
+ Vercel Deploy Hook
+        |
+        v
+     Vercel
+        |
+        v
+   Production
+```
 
-[GitHub](https://github.com/Ahmed-31-Anwar)
+---
+
+# Failure Handling
+
+The pipeline intentionally separates stages.
+
+If Build fails:
+
+```text
+Test should not proceed as a successful dependency.
+```
+
+If Test fails:
+
+```text
+Release should not proceed.
+```
+
+If Test succeeds on a branch other than `main`:
+
+```text
+Production Release is not triggered by the Release condition.
+```
+
+---
+
+# Why Build Runs on Pull Requests
+
+Pull request builds provide early validation.
+
+A proposed change can be checked before it becomes part of `main`.
+
+This helps identify:
+
+- Compilation errors.
+- Dependency problems.
+- Prisma issues.
+- Build configuration problems.
+
+---
+
+# Why Build Runs on Main
+
+Build also runs on pushes to `main`.
+
+This ensures the main branch is directly validated.
+
+It also allows the downstream workflow chain to begin for production changes.
+
+---
+
+# Why Test Uses workflow_run
+
+The Test workflow uses:
+
+```yaml
+workflow_run
+```
+
+to depend on the Build workflow.
+
+This creates an explicit relationship:
+
+```text
+Build
+  |
+  v
+Test
+```
+
+The Test workflow checks the Build result before starting its job.
+
+---
+
+# Why Release Uses workflow_run
+
+The Release workflow also uses:
+
+```yaml
+workflow_run
+```
+
+This creates:
+
+```text
+Test
+  |
+  v
+Release
+```
+
+The Release job checks that Test succeeded.
+
+It also checks that the source branch is `main`.
+
+---
+
+# Why Check out head_sha
+
+The Test workflow checks out:
+
+```yaml
+ref: ${{ github.event.workflow_run.head_sha }}
+```
+
+This ensures the Test workflow uses the exact commit associated with the Build workflow.
+
+This reduces the chance of testing a different revision from the one that was built.
+
+---
+
+# Production Release Gate
+
+The production release is gated by:
+
+```text
+Successful Build
+        |
+        v
+Successful Test
+        |
+        v
+main branch
+        |
+        v
+Release
+```
+
+---
+
+# Historical Deployment Approach
+
+During project setup, Vercel CLI deployment was tested.
+
+The command:
+
+```bash
+npx vercel deploy --prod
+```
+
+was used interactively.
+
+This successfully demonstrated that the project could be deployed.
+
+The final CI/CD approach moved the release trigger to a Vercel Deploy Hook.
+
+---
+
+# Why the Final Release Uses a Deploy Hook
+
+The Deploy Hook approach keeps the Release workflow simple.
+
+The workflow only needs to send:
+
+```http
+POST
+```
+
+to the configured Vercel Deploy Hook.
+
+The actual URL remains stored as a secret.
+
+---
+
+# Vercel Token History
+
+Older Vercel configuration may have included token and project identifiers.
+
+The current Release workflow does not depend on:
+
+```text
+VERCEL_TOKEN
+VERCEL_ORG_ID
+VERCEL_PROJECT_ID
+```
+
+The current release mechanism uses:
+
+```text
+VERCEL_DEPLOY_HOOK
+```
+
+---
+
+# Current GitHub Secrets
+
+The active CI/CD secrets are:
+
+```text
+DATABASE_URL
+VERCEL_DEPLOY_HOOK
+```
+
+Authentication variables are used by the application environment separately.
+
+---
+
+# Production Authentication Variables
+
+The application requires:
+
+```text
+AUTH_SECRET
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+DATABASE_URL
+```
+
+These should be configured in the production environment.
+
+---
+
+# Application Responsibilities
+
+The application itself is responsible for:
+
+- Authentication.
+- Session handling.
+- Task creation.
+- Task retrieval.
+- Task deletion.
+- Database interaction.
+- User-specific data.
+
+---
+
+# CI Responsibilities
+
+GitHub Actions is responsible for:
+
+- Building.
+- Linting.
+- Type checking.
+- Testing.
+- Production build verification.
+- Triggering the production release.
+
+---
+
+# Vercel Responsibilities
+
+Vercel is responsible for:
+
+- Hosting the application.
+- Running the production deployment.
+- Providing the production URL.
+- Managing production deployment infrastructure.
+
+---
+
+# Neon Responsibilities
+
+Neon is responsible for:
+
+- PostgreSQL hosting.
+- Persistent database storage.
+- Database connectivity.
+
+---
+
+# Google Responsibilities
+
+Google OAuth provides:
+
+- User authentication.
+- Google identity verification.
+- OAuth authorization flow.
+
+---
+
+# Separation of Responsibilities
+
+The project can therefore be viewed as:
+
+```text
+Next.js
+Application
+
+NextAuth.js
+Authentication
+
+Google
+Identity Provider
+
+Prisma
+Database Access
+
+Neon
+Database Hosting
+
+GitHub
+Source Control
+
+GitHub Actions
+Automation
+
+Vercel
+Deployment
+```
+
+---
+
+# Project Learning Areas
+
+This project demonstrates:
+
+- Next.js.
+- React.
+- TypeScript.
+- API routes.
+- Authentication.
+- OAuth.
+- PostgreSQL.
+- Prisma.
+- Environment variables.
+- Automated testing.
+- ESLint.
+- CI/CD.
+- GitHub Actions.
+- Vercel.
+- Deploy Hooks.
+- Production deployment.
+
+---
+
+# Development Lessons
+
+One important lesson is that local development and CI environments are different.
+
+A command that works locally may fail in CI if an environment variable is missing.
+
+A generated file that exists locally may not exist in a clean CI runner.
+
+A production OAuth callback may differ from the local callback.
+
+A deployment can succeed while authentication still fails if production environment variables are incorrect.
+
+---
+
+# CI Lessons
+
+CI should reproduce important production checks.
+
+The project therefore runs:
+
+```bash
+npm run lint
+```
+
+```bash
+npx tsc --noEmit
+```
+
+```bash
+npm test
+```
+
+```bash
+npm run build
+```
+
+---
+
+# Database Lessons
+
+Database configuration should not be hard-coded.
+
+The connection should be supplied through:
+
+```text
+DATABASE_URL
+```
+
+This allows different environments to use different database configurations without changing source code.
+
+---
+
+# Authentication Lessons
+
+OAuth requires the callback configuration to match the deployment environment.
+
+Local and production URLs are different.
+
+Therefore the OAuth configuration must account for the production deployment URL.
+
+---
+
+# Testing Lessons
+
+Testing API route handlers provides useful validation of backend behavior.
+
+Mocking authentication and database dependencies allows the route logic to be tested without requiring a full browser session.
+
+---
+
+# Code Quality Lessons
+
+Generated files should not automatically be treated as application source files.
+
+The ESLint configuration therefore excludes generated Prisma files and skill directories.
+
+---
+
+# Deployment Lessons
+
+A deployment workflow should have clear stages.
+
+The project uses:
+
+```text
+Build
+  |
+  v
+Test
+  |
+  v
+Release
+```
+
+This makes failures easier to identify.
+
+---
+
+# Future Improvements
+
+Possible future improvements include:
+
+- Edit tasks.
+- Mark tasks as completed.
+- Add task priorities.
+- Add task categories.
+- Add due dates.
+- Add sorting.
+- Add filtering.
+- Add search.
+- Add pagination.
+- Add richer task metadata.
+- Add user profile information.
+- Add improved error messages.
+- Add more automated tests.
+- Add browser-based end-to-end tests.
+- Add deployment previews.
+- Add database migration automation.
+- Add monitoring.
+- Add analytics.
+- Add accessibility improvements.
+- Add responsive UI improvements.
+
+---
+
+# Possible Testing Improvements
+
+Future testing could include:
+
+- Component tests.
+- Authentication tests.
+- Database integration tests.
+- End-to-end tests.
+- Browser tests.
+- Error-state tests.
+- Unauthorized request tests.
+- User isolation tests.
+
+---
+
+# Possible API Improvements
+
+Future API improvements could include:
+
+```text
+GET    /api/tasks
+POST   /api/tasks
+PATCH  /api/tasks/:id
+DELETE /api/tasks/:id
+```
+
+This would allow tasks to be edited and updated individually.
+
+---
+
+# Possible Task Features
+
+Future tasks could contain:
+
+- Title.
+- Description.
+- Completed state.
+- Priority.
+- Due date.
+- Created date.
+- Updated date.
+- Category.
+
+---
+
+# Possible UI Improvements
+
+Future UI improvements could include:
+
+- Task filters.
+- Search.
+- Animations.
+- Empty states.
+- Loading states.
+- Error states.
+- Better mobile layouts.
+- Keyboard shortcuts.
+- Improved accessibility.
+- Task editing.
+- Task completion controls.
+
+---
+
+# Maintainability
+
+The project is structured so that:
+
+- Frontend code is inside `src/app`.
+- Components are separated.
+- Authentication has its own configuration.
+- Database access has its own library file.
+- API routes are grouped under `src/app/api`.
+- Tests are separated from application code.
+- CI workflows are stored under `.github/workflows`.
+
+---
+
+# Recommended Development Process
+
+For a new feature:
+
+```text
+1. Understand requirement
+2. Plan change
+3. Implement locally
+4. Run application
+5. Test manually
+6. Run lint
+7. Run TypeScript
+8. Run tests
+9. Build
+10. Commit
+11. Push
+12. Review GitHub Actions
+13. Merge
+14. Verify deployment
+```
+
+---
+
+# Recommended Debugging Process
+
+When something breaks:
+
+```text
+1. Identify exact error
+2. Find affected layer
+3. Reproduce locally
+4. Check configuration
+5. Check logs
+6. Apply smallest fix
+7. Run local validation
+8. Commit fix
+9. Push
+10. Verify CI
+11. Verify production
+```
+
+---
+
+# Recommended Secret Management
+
+Secrets should always remain outside source code.
+
+Use:
+
+```text
+.env.local
+```
+
+for local values.
+
+Use:
+
+```text
+GitHub Secrets
+```
+
+for CI.
+
+Use:
+
+```text
+Vercel Environment Variables
+```
+
+for production.
+
+---
+
+# Recommended Git Practice
+
+Keep commits focused.
+
+A commit should ideally represent one logical change.
+
+Examples:
+
+```text
+Add functional tests to CI
+```
+
+```text
+Ignore generated Prisma files in ESLint
+```
+
+```text
+Run build on main pushes
+```
+
+Focused commits make the history easier to understand.
+
+---
+
+# Recommended CI Practice
+
+CI should fail when a meaningful validation fails.
+
+A green workflow should provide confidence that:
+
+- The application builds.
+- TypeScript is valid.
+- Linting passes.
+- Tests pass.
+- The production build succeeds.
+
+---
+
+# Recommended Release Practice
+
+Production deployment should happen only after required validation succeeds.
+
+The current workflow therefore uses:
+
+```text
+Build
+  |
+  v
+Test
+  |
+  v
+Release
+```
+
+---
+
+# Production URL
+
+The current production application is:
+
+```text
+https://task-manager-nine-khaki-16.vercel.app
+```
+
+---
+
+# GitHub Repository
+
+The source repository is:
+
+```text
+https://github.com/Ahmed-31-Anwar/task-manager
+```
+
+---
+
+# Project Directory
+
+The local project is:
+
+```text
+C:\Users\F-05\Desktop\Projects\task-manager
+```
+
+---
+
+# Current Status
+
+The application is operational.
+
+Authentication is configured.
+
+Google OAuth is configured.
+
+The PostgreSQL database is configured.
+
+Prisma is configured.
+
+The task API is implemented.
+
+Functional tests are implemented.
+
+The test suite passes.
+
+ESLint passes.
+
+TypeScript validation passes.
+
+The production build passes.
+
+GitHub Actions CI is configured.
+
+The Release workflow is configured.
+
+The Vercel Deploy Hook is configured.
+
+Production deployment has successfully been triggered.
+
+---
+
+# Final CI/CD Summary
+
+```text
+Developer
+    |
+    v
+GitHub
+    |
+    v
+Build Workflow
+    |
+    +---- Checkout
+    |
+    +---- Node.js 24
+    |
+    +---- npm ci
+    |
+    +---- Prisma contract
+    |
+    +---- Next.js build
+    |
+    v
+Test Workflow
+    |
+    +---- Checkout exact SHA
+    |
+    +---- Node.js 24
+    |
+    +---- npm ci
+    |
+    +---- Prisma contract
+    |
+    +---- ESLint
+    |
+    +---- TypeScript
+    |
+    +---- Vitest
+    |
+    +---- Production build
+    |
+    v
+Release Workflow
+    |
+    +---- Successful Test
+    |
+    +---- main branch
+    |
+    +---- Vercel Deploy Hook
+    |
+    v
+Vercel
+    |
+    v
+Production
+```
+
+---
+
+# Final Application Summary
+
+Task Manager is a full-stack Next.js application with:
+
+- Google authentication.
+- Authenticated sessions.
+- PostgreSQL persistence.
+- Neon database hosting.
+- Prisma database access.
+- Task API routes.
+- User-specific tasks.
+- Task creation.
+- Task deletion.
+- Automated tests.
+- ESLint.
+- TypeScript validation.
+- Production builds.
+- GitHub source control.
+- GitHub Actions CI/CD.
+- Vercel deployment.
+
+---
+
+# Final Pipeline Summary
+
+The current pipeline is:
+
+```text
+Push / Pull Request
+        |
+        v
+      Build
+        |
+        v
+       Test
+        |
+        v
+     Release
+        |
+        v
+     Vercel
+        |
+        v
+   Production
+```
+
+---
+
+# Author
+
+**Muhammad Ahmed Anwar**
+
+---
+
+# Project Links
+
+## GitHub
+
+```text
+https://github.com/Ahmed-31-Anwar/task-manager
+```
+
+## Production
+
+```text
+https://task-manager-nine-khaki-16.vercel.app
+```
+
+---
+
+# Conclusion
+
+Task Manager combines a modern Next.js application with PostgreSQL persistence, Google authentication, automated testing, and a complete GitHub Actions CI/CD pipeline.
+
+The project separates application development from automated validation and deployment.
+
+The Build workflow verifies that the application can compile.
+
+The Test workflow verifies code quality, TypeScript, automated tests, and the production build.
+
+The Release workflow verifies that the Test workflow succeeded and that the source branch is `main` before triggering the Vercel deployment.
+
+The Vercel Deploy Hook keeps the deployment trigger separate from application source code and keeps the actual deployment URL stored as a secret.
+
+The resulting workflow provides a repeatable development and release process:
+
+```text
+Develop
+  |
+  v
+Commit
+  |
+  v
+Push
+  |
+  v
+Build
+  |
+  v
+Test
+  |
+  v
+Release
+  |
+  v
+Deploy
+  |
+  v
+Production
+```
+
+The project is currently configured with:
+
+```text
+Next.js
+React
+TypeScript
+Tailwind CSS
+NextAuth.js
+Google OAuth
+Prisma
+PostgreSQL
+Neon
+Vitest
+ESLint
+GitHub
+GitHub Actions
+Vercel
+```
+
+The production application is available at:
+
+```text
+https://task-manager-nine-khaki-16.vercel.app
+```
+
+The source code is available at:
+
+```text
+https://github.com/Ahmed-31-Anwar/task-manager
+```
+
+The project is ready for continued development and future feature additions.
