@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
+      - name: Emit Prisma contract
+        run: npx prisma contract emit
 
       - name: Build Next.js application
         run: npm run build
