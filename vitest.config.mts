@@ -11,7 +11,10 @@ export default defineConfig({
       "@": path.resolve(currentDirectory, "./src"),
     },
   },
+
   test: {
     environment: "node",
+    include: ["tests/**/*.test.ts"],
+    exclude: ["e2e/**"],
   },
 });
