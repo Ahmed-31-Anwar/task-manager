@@ -58,6 +58,22 @@ The workflow includes:
 - [TypeScript](#typescript)
 - [Testing](#testing)
 - [Vitest](#vitest)
+- [Playwright](#playwright)
+- [End-to-End Testing](#end-to-end-testing)
+- [E2E Test Authentication](#e2e-test-authentication)
+- [Test Login Route](#test-login-route)
+- [E2E Test Coverage](#e2e-test-coverage)
+- [Playwright Configuration](#playwright-configuration)
+- [E2E Testing Commands](#e2e-testing-commands)
+- [Automated Testing Architecture](#automated-testing-architecture)
+- [Playwright Test Results](#playwright-test-results)
+- [Current E2E Test Status](#current-e2e-test-status)
+- [E2E Testing Security](#e2e-testing-security)
+- [E2E Testing Checklist](#e2e-testing-checklist)
+- [Local E2E Testing Flow](#local-e2e-testing-flow)
+- [Playwright and Vitest](#playwright-and-vitest)
+- [Automated Test Summary](#automated-test-summary)
+
 - [Production Build](#production-build)
 - [GitHub](#github)
 - [Git Workflow](#git-workflow)
@@ -287,6 +303,7 @@ GitHub Actions
 | PostgreSQL | Relational database |
 | Neon | PostgreSQL hosting |
 | Vitest | Automated testing |
+| Playwright | Browser-based end-to-end testing |
 | ESLint | Code quality |
 | GitHub | Source control |
 | GitHub Actions | CI/CD |
@@ -790,8 +807,12 @@ task-manager/
 │   └── auth.ts
 ├── tests/
 │   └── tasks.test.ts
+
+├── e2e/
+│   └── tasks.spec.ts
 ├── .gitignore
 ├── README.md
+├── playwright.config.ts
 ├── next.config.ts
 ├── package.json
 ├── prisma.config.ts
@@ -868,6 +889,53 @@ Contains ESLint configuration.
 ## `vitest.config.mts`
 
 Contains Vitest configuration.
+
+
+---
+
+# `e2e/tasks.spec.ts`
+
+Contains the browser-based Playwright end-to-end tests.
+
+The tests exercise complete application workflows through a real browser rather than calling the API route handlers directly.
+
+The current E2E suite covers:
+
+- Authenticated dashboard access.
+- Logged-out authentication interface.
+- Task creation.
+- Task persistence after refresh.
+- Task deletion.
+- Empty task validation.
+- Unauthenticated API protection.
+- User-to-user task isolation.
+
+---
+
+# `playwright.config.ts`
+
+Contains the Playwright configuration.
+
+The configuration:
+
+- Uses the `e2e/` directory for browser tests.
+- Uses Chromium for the current E2E project.
+- Starts the Next.js development server automatically.
+- Uses `http://localhost:3000` as the local base URL.
+- Reuses an existing local development server when available.
+- Collects traces on the first retry.
+
+---
+
+# `src/app/api/test-login/route.ts`
+
+Contains the local E2E testing authentication route.
+
+This route exists only to create deterministic authenticated test sessions for local Playwright tests.
+
+It is not the normal Google OAuth login flow.
+
+The route is protected by environment checks and is unavailable in production.
 
 ---
 
@@ -1068,6 +1136,622 @@ Starts the development server.
 ---
 
 ## Production Build
+
+---
+
+# Playwright
+
+Playwright is used for browser-based end-to-end testing.
+
+While Vitest tests the task API route handlers directly, Playwright tests the application from the perspective of a real browser user.
+
+This makes the E2E suite useful for verifying that the frontend, authentication session, API routes, database persistence, and user interface work together.
+
+The Playwright tests are stored in:
+
+```text
+e2e/
+└── tasks.spec.ts
+```
+
+The Playwright configuration is stored in:
+
+```text
+playwright.config.ts
+```
+
+---
+
+# End-to-End Testing
+
+End-to-end testing verifies complete application workflows instead of testing only individual functions.
+
+The current Playwright tests exercise the actual local application.
+
+The main workflow is:
+
+```text
+Browser
+  |
+  v
+Next.js Application
+  |
+  v
+Authentication Session
+  |
+  v
+Task Dashboard
+  |
+  v
+/api/tasks
+  |
+  v
+PostgreSQL
+```
+
+This gives the project a second testing layer in addition to the existing Vitest API tests.
+
+---
+
+# E2E Test Authentication
+
+The normal application authentication flow uses Google OAuth.
+
+Using the real Google login page for automated E2E tests would make the test suite dependent on an external interactive authentication flow.
+
+For local E2E testing, the project therefore uses a dedicated test authentication route.
+
+The test route creates a deterministic test user and creates an authenticated session cookie.
+
+This allows Playwright to test authenticated application behavior without requiring manual Google login for every test run.
+
+The test authentication route is:
+
+```text
+/api/test-login
+```
+
+The route is intended only for local automated testing.
+
+---
+
+# Test Login Route
+
+The test login route is:
+
+```text
+src/app/api/test-login/route.ts
+```
+
+The route checks:
+
+```text
+NODE_ENV
+E2E_TEST
+```
+
+The route returns `404 Not Found` when:
+
+```text
+NODE_ENV === production
+```
+
+or when:
+
+```text
+E2E_TEST !== true
+```
+
+This means the route is not available as a production authentication mechanism.
+
+The local E2E environment enables:
+
+```env
+E2E_TEST=true
+```
+
+The route then:
+
+1. Creates the deterministic test user if it does not already exist.
+2. Creates an Auth.js session token.
+3. Sets the authentication cookie.
+4. Returns a successful response.
+5. Allows Playwright to continue as an authenticated user.
+
+---
+
+# E2E Test Users
+
+The Playwright suite can use deterministic test identities.
+
+The default test identity is:
+
+```text
+playwright-test@example.com
+```
+
+Additional test users can be created using different email addresses.
+
+This is useful for testing user isolation.
+
+For example:
+
+```text
+User A
+  |
+  +---- User A task
+
+User B
+  |
+  +---- User B task
+```
+
+The E2E suite can then verify that User A cannot delete User B's task.
+
+---
+
+# E2E Test Coverage
+
+The current Playwright suite contains six browser and application-level tests.
+
+The tests cover:
+
+1. Authenticated dashboard access.
+2. Logged-out Google sign-in option.
+3. Adding, persisting, and deleting a task.
+4. Rejecting an empty task.
+5. Rejecting unauthenticated task API access.
+6. Preventing one user from deleting another user's task.
+
+---
+
+# Authenticated Dashboard Test
+
+The authenticated dashboard test verifies that an authenticated user can access the main application.
+
+The test establishes a local authenticated session and opens the dashboard.
+
+It verifies that the expected dashboard content is available.
+
+This confirms that the authentication state is recognized by the application.
+
+---
+
+# Logged-Out Authentication Test
+
+The logged-out test verifies the unauthenticated experience.
+
+It opens the application without an authenticated test session.
+
+The test verifies that the Google sign-in option is visible.
+
+The expected authentication control is:
+
+```text
+Continue with Google
+```
+
+This confirms that the application presents the expected login interface to logged-out users.
+
+---
+
+# Add, Persist, and Delete Test
+
+The main E2E workflow verifies the complete task lifecycle.
+
+The workflow is:
+
+```text
+Login
+  |
+  v
+Open dashboard
+  |
+  v
+Add task
+  |
+  v
+Task appears
+  |
+  v
+Refresh page
+  |
+  v
+Task remains
+  |
+  v
+Delete task
+  |
+  v
+Task disappears
+```
+
+This test verifies more than the individual API operations.
+
+It verifies that the frontend, API, database, and browser state work together.
+
+---
+
+# Empty Task Validation Test
+
+The E2E suite also verifies that an empty task cannot be submitted.
+
+This protects the application from accepting invalid task input through the user interface.
+
+The test checks the visible validation behavior rather than only testing the API handler.
+
+---
+
+# Unauthenticated API Test
+
+The E2E suite verifies that a user without an authenticated session cannot access protected task functionality.
+
+The expected API response is:
+
+```text
+401 Unauthorized
+```
+
+This verifies the authentication boundary at the API level.
+
+---
+
+# User Isolation E2E Test
+
+The user isolation test creates a task for one test user and then attempts to delete that task as another test user.
+
+The expected behavior is that the second user cannot delete the first user's task.
+
+The API responds with:
+
+```text
+404 Not Found
+```
+
+when the task does not belong to the authenticated user.
+
+This verifies the ownership protection through an actual application workflow.
+
+---
+
+# Playwright Configuration
+
+The current Playwright configuration uses:
+
+```text
+playwright.config.ts
+```
+
+The configuration includes:
+
+```text
+testDir: ./e2e
+baseURL: http://localhost:3000
+Chromium
+Next.js development server
+```
+
+The Playwright web server configuration starts:
+
+```bash
+npm run dev
+```
+
+automatically when the tests need a local application server.
+
+The configuration also uses:
+
+```text
+reuseExistingServer: true
+```
+
+so an already-running local development server can be reused.
+
+---
+
+# E2E Testing Commands
+
+Run the complete Playwright suite:
+
+```bash
+npx playwright test
+```
+
+Run Playwright with the browser visible:
+
+```bash
+npx playwright test --headed
+```
+
+Run only the task E2E specification:
+
+```bash
+npx playwright test e2e/tasks.spec.ts
+```
+
+Open the Playwright HTML report:
+
+```bash
+npx playwright show-report
+```
+
+Install the required Playwright browsers when setting up the project:
+
+```bash
+npx playwright install
+```
+
+---
+
+# Automated Testing Architecture
+
+The project now uses two complementary testing layers.
+
+```text
+                    Automated Testing
+                           |
+             +-------------+-------------+
+             |                           |
+             v                           v
+          Vitest                    Playwright
+             |                           |
+             v                           v
+      API Route Tests             Browser E2E Tests
+             |                           |
+             v                           v
+       Task API Logic          Complete User Workflows
+```
+
+Vitest focuses on the API route handlers.
+
+Playwright focuses on the complete browser workflow.
+
+This separation allows each testing tool to validate the layer it is best suited to test.
+
+---
+
+# Playwright and Vitest
+
+Vitest and Playwright are not replacements for one another.
+
+Vitest is used for fast API-level testing.
+
+The current Vitest suite verifies:
+
+```text
+GET /api/tasks
+POST /api/tasks
+DELETE /api/tasks
+```
+
+Playwright is used for browser-level end-to-end testing.
+
+The current Playwright suite verifies:
+
+```text
+Authentication
+Task creation
+Task persistence
+Task deletion
+Validation
+API protection
+User isolation
+```
+
+Together they provide broader automated coverage than either testing approach alone.
+
+---
+
+# Playwright Test Results
+
+The current Playwright test suite contains:
+
+```text
+6 tests
+6 passed
+0 failed
+```
+
+The latest successful run completed with:
+
+```text
+6 passed (24.2s)
+```
+
+The test run used:
+
+```text
+Chromium
+```
+
+The PostgreSQL driver may display an SSL-mode warning during the local E2E run.
+
+The warning does not currently prevent the test suite from passing.
+
+---
+
+# Current E2E Test Status
+
+The current automated browser test result is:
+
+```text
+Playwright
+6/6 passing
+```
+
+The current API test result is:
+
+```text
+Vitest
+3/3 passing
+```
+
+The combined automated test count is:
+
+```text
+9/9 passing
+```
+
+These represent two separate test suites covering different layers of the application.
+
+---
+
+# E2E Testing Security
+
+The local E2E authentication route is intentionally restricted.
+
+The route requires:
+
+```text
+E2E_TEST=true
+```
+
+and also checks that the application is not running in production.
+
+The production condition takes priority.
+
+The route is therefore unavailable when:
+
+```text
+NODE_ENV=production
+```
+
+even if an E2E-related environment variable were accidentally present.
+
+The test login route must never be used as a production authentication mechanism.
+
+---
+
+# Local E2E Testing Flow
+
+The local E2E process is:
+
+```text
+Start Playwright
+      |
+      v
+Start / reuse Next.js server
+      |
+      v
+Create test authentication session
+      |
+      v
+Open application in Chromium
+      |
+      v
+Perform user workflow
+      |
+      v
+Call application API
+      |
+      v
+Read/write PostgreSQL
+      |
+      v
+Verify visible result
+      |
+      v
+Test complete
+```
+
+This allows the project to test the application as an integrated system.
+
+---
+
+# E2E Testing Checklist
+
+Before considering the E2E suite healthy:
+
+- [ ] Playwright is installed.
+- [ ] Playwright browsers are installed.
+- [ ] The local Next.js application starts.
+- [ ] `E2E_TEST=true` is available in the local E2E environment.
+- [ ] The test authentication route works locally.
+- [ ] An authenticated dashboard can be opened.
+- [ ] A task can be created.
+- [ ] A created task remains after refresh.
+- [ ] A task can be deleted.
+- [ ] Empty task input is rejected.
+- [ ] Unauthenticated API access is rejected.
+- [ ] Cross-user task deletion is rejected.
+- [ ] All Playwright tests pass.
+
+---
+
+# Automated Test Summary
+
+The project now has both API-level and browser-level automated tests.
+
+```text
+                    Automated Tests
+                          |
+          +---------------+---------------+
+          |                               |
+          v                               v
+       Vitest                         Playwright
+          |                               |
+          v                               v
+      3 tests                          6 tests
+          |                               |
+          v                               v
+      3 passing                        6 passing
+```
+
+Current result:
+
+```text
+Vitest      3/3
+Playwright  6/6
+Total       9/9
+```
+
+The two suites complement each other and provide coverage across both backend route behavior and complete user workflows.
+
+---
+
+# Playwright and CI/CD
+
+Playwright is currently configured for local end-to-end testing.
+
+The existing GitHub Actions Test workflow continues to run:
+
+```bash
+npm test
+```
+
+which executes the Vitest suite.
+
+The current GitHub Actions workflow does not claim to run the Playwright browser suite.
+
+This keeps the existing CI/CD behavior unchanged while allowing the project to run full browser E2E tests locally.
+
+A future CI workflow can add Playwright browser testing separately if required.
+
+---
+
+# E2E Test Reports
+
+Playwright can generate an HTML test report.
+
+After a test run, the report can be opened with:
+
+```bash
+npx playwright show-report
+```
+
+The report provides a visual summary of:
+
+- Passed tests.
+- Failed tests.
+- Test duration.
+- Browser information.
+- Test steps.
+- Available traces when retries occur.
+
+This makes Playwright results easier to inspect when demonstrating the project or investigating an E2E failure.
+
+---
+
 
 ```bash
 npm run build
@@ -3198,6 +3882,10 @@ Before pushing changes:
 - [ ] `npx tsc --noEmit` passes.
 - [ ] `npm test` passes.
 - [ ] `npm run build` passes.
+- [ ] Playwright E2E tests pass.
+- [ ] Browser E2E task persistence has been checked.
+- [ ] User isolation has been checked through an E2E workflow.
+
 
 ---
 
@@ -3212,6 +3900,11 @@ Before merging:
 - [ ] Authentication has been checked.
 - [ ] API behavior has been checked.
 - [ ] Database behavior has been checked.
+- [ ] Playwright E2E tests pass.
+- [ ] Browser task persistence has been checked.
+- [ ] User isolation has been checked.
+- [ ] Logged-out authentication interface has been checked.
+
 
 ---
 
@@ -3805,6 +4498,26 @@ This makes failures easier to identify.
 
 # Future Improvements
 
+---
+
+# Current E2E Implementation
+
+Browser-based end-to-end testing has now been added to the project using Playwright.
+
+The implementation includes:
+
+- `@playwright/test`.
+- `playwright.config.ts`.
+- `e2e/tasks.spec.ts`.
+- A local-only E2E authentication route.
+- Six passing E2E tests.
+- Authenticated and unauthenticated workflows.
+- Task persistence testing.
+- User isolation testing.
+
+The existing GitHub Actions Test workflow remains unchanged and continues to run Vitest.
+
+
 Possible future improvements include:
 
 - Edit tasks.
@@ -4229,6 +4942,15 @@ https://task-manager-nine-khaki-16.vercel.app
 ---
 
 # Conclusion
+
+Additional browser testing is provided by:
+
+```text
+Playwright
+```
+
+The project therefore has both API-level testing and browser-based end-to-end testing.
+
 
 Task Manager combines a modern Next.js application with PostgreSQL persistence, Google authentication, automated testing, and a complete GitHub Actions CI/CD pipeline.
 
