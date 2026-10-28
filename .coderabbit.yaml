@@ -1,0 +1,42 @@
+
+# CodeRabbit configuration
+# https://docs.coderabbit.ai/
+
+language: "en-US"
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+    base_branches:
+      - "main"
+
+  path_instructions:
+    - path: "src/**"
+      instructions: >
+        Review application code for correctness, authentication,
+        authorisation, user-data isolation, input validation,
+        error handling, and missing tests. Follow AGENTS.md
+        and REVIEW.md. Report actionable findings with severity,
+        file location, evidence, impact, and recommended fix.
+
+    - path: "prisma/**"
+      instructions: >
+        Review database schema and database access for data
+        integrity, unsafe access, migration risks, and whether
+        users can access only their own records. Follow
+        AGENTS.md and REVIEW.md.
+
+    - path: ".github/workflows/**"
+      instructions: >
+        Review GitHub Actions permissions, exposed secrets,
+        untrusted pull request code execution, unsafe commands,
+        and supply-chain risks. Recommend least-privilege
+        permissions and pinned actions where practical.
