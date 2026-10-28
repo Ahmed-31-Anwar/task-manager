@@ -65,8 +65,8 @@ jobs:
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      E2E_TEST: "true"
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      E2E_TEST: "true"
 
     steps:
       - name: Checkout code
