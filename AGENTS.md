@@ -1,48 +1,107 @@
-
 # AGENTS.md — Task Manager
 
-## Project Overview
-This project is a task management application built with
-Next.js, React, TypeScript, NextAuth.js, Prisma and PostgreSQL.
+## 1. Project Overview
 
-Users authenticate with Google and should only be able to
-access their own tasks.
+This project is a task management application built with Next.js, React, TypeScript, NextAuth.js, Prisma, and PostgreSQL.
 
-## Review Requirements
-Before reviewing a pull request, read REVIEW.md.
+Users authenticate with Google and should only be able to access their own tasks and data.
 
-Review the actual code changes and their impact on the
-existing application.
+## 2. Review Instructions
+
+Before reviewing a pull request, read both `AGENTS.md` and `REVIEW.md`.
+
+Apply the requirements in `REVIEW.md` to every changed file, including application code, tests, database schemas, migrations, configuration files, dependencies, documentation, deployment settings, and GitHub Actions workflows.
+
+Review the actual changes and their impact on the existing application. Do not assume that unchanged code is correct if a changed file exposes a related problem.
+
+## 3. Code Quality and Correctness
 
 Check for:
 - Bugs and incorrect application behaviour.
-- Authentication and authorisation vulnerabilities.
-- Users accessing another user's tasks or data.
-- SQL injection, cross-site scripting and unsafe input handling.
-- Exposed secrets and unsafe environment configuration.
-- Dependency vulnerabilities.
+- Incorrect logic and unexpected edge cases.
+- Missing error handling and input validation.
+- TypeScript errors and incorrect types.
+- Duplicated code and unnecessary complexity.
 - Missing tests and regressions.
-- GitHub Actions and deployment security problems.
+- Incorrect environment configuration.
+- Dependency, build, and deployment problems.
 
-## Evidence
-For each finding, include:
-- Severity: Critical, High, Medium or Low.
-- File and line number when available.
-- What happened and why it matters.
+Prioritise actionable findings over stylistic preferences.
+
+## 4. Security Requirements
+
+Pay particular attention to:
+- Authentication bypasses and incorrect session handling.
+- Missing server-side authorisation checks.
+- Users accessing tasks or data belonging to other users.
+- SQL injection, cross-site scripting, and unsafe input handling.
+- Exposed credentials, tokens, API keys, and private environment variables.
+- Dependency vulnerabilities supported by available evidence.
+- Excessive GitHub Actions permissions.
+- Unsafe execution of untrusted pull request code.
+- Untrusted input passed to shell commands.
+- Unsafe third-party workflow actions.
+
+Recommend least-privilege permissions and secure handling of secrets.
+
+## 5. Evidence and Severity
+
+Follow the severity definitions, testing requirements, and merge recommendation rules in `REVIEW.md`.
+
+For every actionable finding, include:
+- Severity: Critical, High, Medium, or Low, using the definitions in `REVIEW.md`.
+- File and line number, when available.
+- A clear explanation of the problem and its cause.
 - A realistic impact or example.
+- Supporting evidence from the available code or checks.
 - A recommended fix.
 
-Do not invent findings, test results or evidence.
-Clearly distinguish confirmed issues from potential risks.
+Do not invent findings, vulnerabilities, test results, or evidence.
 
-## Merge Recommendation
-Every completed review should recommend one of:
+Clearly distinguish confirmed issues from potential risks. Explain uncertainty, avoid duplicate findings, and do not exaggerate the impact of a problem.
 
-- DO NOT MERGE
-- NEEDS HUMAN REVIEW
-- NO BLOCKERS FOUND
+## 6. Testing and Validation
 
-Explain the evidence behind the recommendation.
+Report only checks that were actually executed or whose results can be verified.
 
-An AI review is not proof that code is secure. Required CI
-checks and human approvals must still be respected.
+When relevant, consider:
+- Build.
+- Lint.
+- TypeScript validation.
+- Vitest.
+- Playwright.
+- Security and dependency checks.
+- Database schema and migration validation.
+
+Use the status definitions in `REVIEW.md`. Never claim a test passed if it was not run or its result cannot be verified.
+
+## 7. Merge Recommendation
+
+Every completed review must provide one of the recommendations defined in `REVIEW.md`:
+
+- `DO NOT MERGE`
+- `NEEDS HUMAN REVIEW`
+- `NO BLOCKERS FOUND`
+
+Explain the evidence behind the recommendation and identify any required follow-up actions.
+
+Do not recommend merging solely because no AI agent found an issue. Respect mandatory CI checks, branch protection rules, and human approval requirements.
+
+## 8. Final Review Summary
+
+When the review tool supports a visible summary on the GitHub pull request, include:
+- A summary of the changes.
+- Important findings and their severities.
+- Relevant security concerns and uncertainties.
+- Actual test and validation results.
+- The merge recommendation and its reasoning.
+
+If no blockers are identified, state that no blockers were found in the available evidence. Do not claim that the application is completely bug-free or secure.
+
+## 9. Human Oversight
+
+AI review agents assist with code review but cannot guarantee correctness or security.
+
+Maintainers remain responsible for validating findings, resolving disagreements between review agents, evaluating accepted risks, and making the final merge decision.
+
+AI-generated approvals must not replace required human review.
