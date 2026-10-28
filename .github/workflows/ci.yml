@@ -1,10 +1,12 @@
+
 name: CI
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-  push:
+      - week-7-review-agents
+  pull_request:
     branches:
       - main
 
@@ -18,14 +20,13 @@ jobs:
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Garnet Runtime Review
-        uses: garnet-org/action@245ad6be82de3200c205109c8ca7ac816dc692ea
+        uses: garnet-org/action@f9ed14ab54564073ec11bba8d62d6980e172d2a0
         with:
           api_token: ${{ secrets.GARNET_API_TOKEN }}
           debug: "true"
@@ -52,28 +53,25 @@ jobs:
         run: npm run build
 
   test:
-    name: Test (${{ matrix.suite }})
+    name: Test (${{ matrix.test_type }})
     needs: build
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        suite:
+        test_type:
           - vitest
           - playwright
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      E2E_TEST: "true"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Garnet Runtime Review
-        uses: garnet-org/action@245ad6be82de3200c205109c8ca7ac816dc692ea
+        uses: garnet-org/action@f9ed14ab54564073ec11bba8d62d6980e172d2a0
         with:
           api_token: ${{ secrets.GARNET_API_TOKEN }}
           debug: "true"
@@ -91,13 +89,13 @@ jobs:
         run: npx prisma contract emit
 
       - name: Install Playwright browsers
-        if: matrix.suite == 'playwright'
-        run: npx playwright install --with-deps chromium
+        if: matrix.test_type == 'playwright'
+        run: npx playwright install --with-deps
 
       - name: Run Vitest
-        if: matrix.suite == 'vitest'
-        run: npm test
+        if: matrix.test_type == 'vitest'
+        run: npx vitest run
 
       - name: Run Playwright
-        if: matrix.suite == 'playwright'
+        if: matrix.test_type == 'playwright'
         run: npx playwright test
