@@ -1,4 +1,3 @@
-
 name: CI
 
 on:
@@ -53,18 +52,21 @@ jobs:
         run: npm run build
 
   test:
-    name: Test (${{ matrix.test_type }})
+    name: Test (${{ matrix.suite }})
     needs: build
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
-        test_type:
+        suite:
           - vitest
           - playwright
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      E2E_TEST: "true"
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
     steps:
       - name: Checkout code
@@ -89,13 +91,13 @@ jobs:
         run: npx prisma contract emit
 
       - name: Install Playwright browsers
-        if: matrix.test_type == 'playwright'
-        run: npx playwright install --with-deps
+        if: matrix.suite == 'playwright'
+        run: npx playwright install --with-deps chromium
 
       - name: Run Vitest
-        if: matrix.test_type == 'vitest'
+        if: matrix.suite == 'vitest'
         run: npx vitest run
 
       - name: Run Playwright
-        if: matrix.test_type == 'playwright'
+        if: matrix.suite == 'playwright'
         run: npx playwright test
