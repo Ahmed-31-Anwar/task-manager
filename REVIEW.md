@@ -11,6 +11,7 @@ These instructions apply to application code, tests, database schemas and migrat
 ## 2. Pull Request Summary
 
 Every review must explain:
+
 - What changed in the pull request.
 - Why the changes were made, when supported by evidence.
 - Which important files or components were affected.
@@ -23,6 +24,7 @@ Do not invent the author's intentions.
 Review the actual changes and their impact on the application.
 
 Check for:
+
 - Incorrect logic, bugs, and unexpected behaviour.
 - Missing error handling and input validation.
 - Duplicated code and unnecessary complexity.
@@ -36,6 +38,7 @@ Prioritise actionable findings over stylistic preferences.
 ## 4. Security Review
 
 Check for:
+
 - Authentication bypasses and incorrect session handling.
 - Missing server-side authorisation checks.
 - Users accessing tasks or data belonging to other users.
@@ -52,6 +55,7 @@ Distinguish confirmed vulnerabilities from potential risks.
 ## 5. Findings and Required Evidence
 
 For every actionable finding, provide:
+
 - Severity: Critical, High, Medium, or Low.
 - File and line number, when available.
 - Description of the problem and its cause.
@@ -64,21 +68,25 @@ Findings must be specific and supported by evidence. Do not invent vulnerabiliti
 ## 6. Severity Definitions
 
 ### Critical
+
 A confirmed issue with severe consequences, such as a readily exploitable authentication bypass or widespread unauthorised access to sensitive data.
 
 **Merge impact:** Block merging until fixed and verified.
 
 ### High
+
 A confirmed issue that could cause significant security, data-integrity, availability, or core application failures under realistic conditions.
 
 **Merge impact:** Block merging until fixed and verified.
 
 ### Medium
+
 A meaningful defect, security weakness, or reliability problem with a more limited impact or narrower conditions.
 
 **Merge impact:** Normally requires human review and a documented decision. Block merging if a mandatory project requirement is violated.
 
 ### Low
+
 A minor defect, maintainability issue, or improvement with limited impact.
 
 **Merge impact:** Does not automatically block merging. A maintainer may accept it or schedule a follow-up.
@@ -88,6 +96,7 @@ Severity must reflect actual impact and evidence, not merely the file type or an
 ## 7. Test and Validation Reporting
 
 Report the actual status of applicable checks:
+
 - Build.
 - Lint.
 - TypeScript validation.
@@ -110,16 +119,19 @@ Never claim that a check passed without verified results. Distinguish automated 
 Every completed review must select exactly one recommendation.
 
 ### DO NOT MERGE
+
 Use when a confirmed Critical or High issue remains unresolved, a mandatory requirement is violated, or a required check has failed.
 
 Explain the blocking issue and what must happen before merging.
 
 ### NEEDS HUMAN REVIEW
+
 Use when important uncertainty remains, a Medium finding requires a maintainer's decision, or necessary evidence or test results are missing.
 
 Explain the concern and the next action required.
 
 ### NO BLOCKERS FOUND
+
 Use when no unresolved blocking issues were identified in the available evidence and required checks have acceptable, verified results.
 
 This does not guarantee that the code is bug-free or secure. It does not override branch protection, required CI checks, or human approval requirements.
@@ -144,6 +156,7 @@ All applicable changes must follow the common evidence, severity, testing, and m
 Every completed review should provide a concise, visible summary on the GitHub pull request when the review tool supports it.
 
 The summary must include:
+
 1. What happened in the pull request.
 2. The most important findings and their severities.
 3. Security concerns and relevant uncertainty.

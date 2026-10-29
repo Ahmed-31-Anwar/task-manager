@@ -15,13 +15,14 @@ reviews:
     drafts: false
     auto_incremental_review: true
 
-  instructions: >
-    Before reviewing any pull request, read AGENTS.md and REVIEW.md.
-    Apply their evidence requirements, severity definitions, testing
-    requirements, and merge recommendation rules to every changed file.
-    Review the actual changes and do not invent findings or test results.
-
   path_instructions:
+    - path: "**"
+      instructions: >
+        Before reviewing any pull request, read AGENTS.md and REVIEW.md.
+        Apply their evidence requirements, severity definitions, testing
+        requirements, and merge recommendation rules to every changed file.
+        Review the actual changes and do not invent findings or test results.
+
     - path: "src/**"
       instructions: >
         Review application code for correctness, authentication,
