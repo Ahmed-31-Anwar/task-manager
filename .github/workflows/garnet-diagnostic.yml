@@ -1,0 +1,37 @@
+
+name: Garnet Diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  garnet-diagnostic:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Start Garnet Runtime Review
+        uses: garnet-org/action@v2
+        with:
+          api_token: ${{ secrets.GARNET_API_TOKEN }}
+          debug: "true"
+          preview: "true"
+
+      - name: Generate test network activity
+        run: |
+          echo "Testing Garnet network capture"
+          curl --fail --silent --show-error \
+            --max-time 15 https://example.com \
+            --output /dev/null
+          echo "Network test completed"
+
+      - name: Inspect Jibril service
+        if: always()
+        run: |
+          sudo systemctl cat jibril || true
+          sudo systemctl show jibril \
+            -p ExecStart -p MainPID -p ActiveState || true
+          ls -l /usr/bin/jibril /usr/local/bin/jibril 2>/dev/null || true
+          sudo journalctl -u jibril -n 100 --no-pager || true
