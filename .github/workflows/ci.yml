@@ -1,4 +1,4 @@
-name: CI with Garnet
+name: CI
 
 on:
   push:
