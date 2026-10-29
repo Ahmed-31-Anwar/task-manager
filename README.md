@@ -5021,5 +5021,5 @@ The source code is available at:
 ```text
 https://github.com/Ahmed-31-Anwar/task-manager
 ```
-
+All pull requests must pass CI checks and receive code review before being merged into main
 The project is ready for continued development and future feature additions.
