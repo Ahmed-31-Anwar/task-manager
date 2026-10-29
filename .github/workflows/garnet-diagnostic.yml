@@ -1,33 +1,120 @@
-name: Garnet Diagnostic
+name: CI with Garnet
 
 on:
   push:
     branches:
+      - main
       - week-7-review-agents
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  garnet-diagnostic:
+  build:
+    name: Build
     runs-on: ubuntu-24.04
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     steps:
-      - name: Start Garnet Runtime Review
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Garnet Runtime Review
         uses: garnet-org/action@v2
         with:
           api_token: ${{ secrets.GARNET_API_TOKEN }}
           debug: "true"
           preview: "true"
 
-      - name: Generate test network activity
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Emit Prisma contract
+        run: npx prisma contract emit
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check TypeScript
+        run: npx tsc --noEmit
+
+      - name: Build Next.js application
+        run: npm run build
+
+      - name: Inspect Jibril service
+        if: always()
         run: |
-          echo "Testing Garnet network capture"
-          curl --fail --silent --show-error \
-            --max-time 15 https://example.com \
-            --output /dev/null
-          echo "Network test completed"
+          sudo systemctl cat jibril || true
+          sudo systemctl show jibril \
+            -p ExecStart -p MainPID -p ActiveState || true
+          ls -l /usr/bin/jibril /usr/local/bin/jibril 2>/dev/null || true
+          sudo journalctl -u jibril -n 100 --no-pager || true
+
+  test:
+    name: Test (${{ matrix.suite }})
+    needs: build
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - vitest
+          - playwright
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      E2E_TEST: "true"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Garnet Runtime Review
+        uses: garnet-org/action@v2
+        with:
+          api_token: ${{ secrets.GARNET_API_TOKEN }}
+          debug: "true"
+          preview: "true"
+          job_index: ${{ strategy.job-index }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Emit Prisma contract
+        run: npx prisma contract emit
+
+      - name: Install Playwright browsers
+        if: matrix.suite == 'playwright'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Vitest
+        if: matrix.suite == 'vitest'
+        run: npx vitest run
+
+      - name: Run Playwright
+        if: matrix.suite == 'playwright'
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+        run: npx playwright test
 
       - name: Inspect Jibril service
         if: always()
