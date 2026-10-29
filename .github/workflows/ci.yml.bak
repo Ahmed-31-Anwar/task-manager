@@ -1,4 +1,4 @@
-name: CI with Garnet
+name: CI
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,7 +15,7 @@ permissions:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -30,7 +29,6 @@ jobs:
         with:
           api_token: ${{ secrets.GARNET_API_TOKEN }}
           debug: "true"
-          preview: "true"
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -53,19 +51,10 @@ jobs:
       - name: Build Next.js application
         run: npm run build
 
-      - name: Inspect Jibril service
-        if: always()
-        run: |
-          sudo systemctl cat jibril || true
-          sudo systemctl show jibril \
-            -p ExecStart -p MainPID -p ActiveState || true
-          ls -l /usr/bin/jibril /usr/local/bin/jibril 2>/dev/null || true
-          sudo journalctl -u jibril -n 100 --no-pager || true
-
   test:
     name: Test (${{ matrix.suite }})
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -87,7 +76,6 @@ jobs:
         with:
           api_token: ${{ secrets.GARNET_API_TOKEN }}
           debug: "true"
-          preview: "true"
           job_index: ${{ strategy.job-index }}
 
       - name: Setup Node.js
@@ -115,12 +103,3 @@ jobs:
         env:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
         run: npx playwright test
-
-      - name: Inspect Jibril service
-        if: always()
-        run: |
-          sudo systemctl cat jibril || true
-          sudo systemctl show jibril \
-            -p ExecStart -p MainPID -p ActiveState || true
-          ls -l /usr/bin/jibril /usr/local/bin/jibril 2>/dev/null || true
-          sudo journalctl -u jibril -n 100 --no-pager || true
