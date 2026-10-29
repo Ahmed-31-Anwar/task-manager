@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - week-7-review-agents
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Garnet Runtime Review
+        uses: garnet-org/action@v2
+        with:
+          api_token: ${{ secrets.GARNET_API_TOKEN }}
+          debug: "true"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Emit Prisma contract
+        run: npx prisma contract emit
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check TypeScript
+        run: npx tsc --noEmit
+
+      - name: Build Next.js application
+        run: npm run build
+
+  test:
+    name: Test (${{ matrix.suite }})
+    needs: build
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - vitest
+          - playwright
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      E2E_TEST: "true"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Garnet Runtime Review
+        uses: garnet-org/action@v2
+        with:
+          api_token: ${{ secrets.GARNET_API_TOKEN }}
+          debug: "true"
+          job_index: ${{ strategy.job-index }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Emit Prisma contract
+        run: npx prisma contract emit
+
+      - name: Install Playwright browsers
+        if: matrix.suite == 'playwright'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Vitest
+        if: matrix.suite == 'vitest'
+        run: npx vitest run
+
+      - name: Run Playwright
+        if: matrix.suite == 'playwright'
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+        run: npx playwright test

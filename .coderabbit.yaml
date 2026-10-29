@@ -1,0 +1,62 @@
+# CodeRabbit configuration
+# https://docs.coderabbit.ai/
+
+language: "en-US"
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+
+  path_instructions:
+    - path: "**"
+      instructions: >
+        Before reviewing any pull request, read AGENTS.md and REVIEW.md.
+        Apply their evidence requirements, severity definitions, testing
+        requirements, and merge recommendation rules to every changed file.
+        Review the actual changes and do not invent findings or test results.
+
+    - path: "src/**"
+      instructions: >
+        Review application code for correctness, authentication,
+        authorisation, user-data isolation, input validation,
+        error handling, and missing tests.
+
+    - path: "tests/**"
+      instructions: >
+        Review test correctness, meaningful coverage, reliability,
+        and whether tests verify the intended application behaviour.
+
+    - path: "e2e/**"
+      instructions: >
+        Review end-to-end test coverage, reliability, authentication
+        flows, user-data isolation, and important user journeys.
+
+    - path: "prisma/**"
+      instructions: >
+        Review database schema and access for data integrity,
+        migration risks, unsafe access, and user-data isolation.
+
+    - path: "migrations/**"
+      instructions: >
+        Review migrations for data loss, integrity problems,
+        unsafe changes, and compatibility with existing data.
+
+    - path: "prisma.config.ts"
+      instructions: >
+        Review database configuration, environment-variable handling,
+        secret exposure, and migration safety.
+
+    - path: ".github/workflows/**"
+      instructions: >
+        Review GitHub Actions permissions, exposed secrets,
+        untrusted pull request code execution, unsafe commands,
+        and supply-chain risks. Recommend least-privilege permissions
+        and pinned actions where practical.
