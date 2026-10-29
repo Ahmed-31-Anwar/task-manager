@@ -1,7 +1,9 @@
-
 name: Garnet Diagnostic
 
 on:
+  push:
+    branches:
+      - week-7-review-agents
   workflow_dispatch:
 
 permissions:
